@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kays's Playground</title>
+  <meta name="description" content="The informal side of Khanh Uyen Giang: side projects, pixel art and a character-sheet CV.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 6' shape-rendering='crispEdges'><path fill='%23ff8fb8' d='M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+15&display=swap">
+  <link rel="stylesheet" href="assets/css/play.css">
+  <script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>Kay's <span>Playground</span></h1>
+    <div class="actions">
+      <a class="btn small" href="./">← Academic</a>
+      <button class="btn small" id="theme" type="button">Dark</button>
+    </div>
+  </header>
+
+  <div class="xp" aria-label="PhD progress">
+    <div class="row"><span>PhD quest · year 1</span><span class="muted">Level up: thesis</span></div>
+    <div class="bar busy"><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+
+  <!-- ===== Character sheet ===== -->
+  <section id="me">
+    <h2>Character sheet</h2>
+    <div class="two">
+      <div class="panel">
+        <div class="hero">
+          <div class="pet">
+            <span class="bob" data-sprite="cat" data-scale="1"></span>
+            <div class="stand"></div>
+          </div>
+          <div>
+            <h3>Kay</h3>
+            <p class="muted small">boba-powered</p>
+          </div>
+        </div>
+        <dl class="hero-dl">
+          <dt>Class</dt><dd>PhD student, quantum info</dd>
+          <dt>Base</dt><dd>Darmstadt, Germany</dd>
+          <dt>Lived in</dt><dd>Hanoi · Brighton · Oxford · Singapore</dd>
+          <dt>Likes</dt><dd>Drawing, crochet, cats, ice &amp; roller skating</dd>
+        </dl>
+        <div class="chips">
+          <span class="chip rose">AWS Certified Cloud Practitioner</span>
+          <span class="chip yellow">Superconducting qubits</span>
+          <span class="chip blue">QuTiP, Qiskit & Qibo</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <!-- <h3>Stats</h3>
+        <div class="stats">
+          <div class="stat"><div class="row"><span>Python</span><span>lvl 7</span></div>
+            <div class="bar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div></div>
+          <div class="stat"><div class="row"><span>Qubit wrangling</span><span>lvl 6</span></div>
+            <div class="bar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div></div>
+          <div class="stat"><div class="row"><span>LaTeX patience</span><span>lvl 5</span></div>
+            <div class="bar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div></div>
+        </div> -->
+        <h3>Languages</h3>
+        <div class="stats">
+          <div class="stat"><div class="row"><span>Vietnamese</span><span>native</span></div>
+            <div class="bar mint"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div></div>
+          <div class="stat"><div class="row"><span>English</span><span>fluent</span></div>
+            <div class="bar mint"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div></div>
+          <div class="stat"><div class="row"><span>German</span><span>B1 · grinding</span></div>
+            <div class="bar blue busy"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Quest log ===== -->
+  <section id="quests">
+    <h2>Quest log</h2>
+    <div class="panel">
+      <ol class="quests" reversed>
+        <li class="quest now"><div>
+          <div class="qhead"><h3>Darmstadt</h3><span class="when">2025 – now</span></div>
+          <p>PhD on quantum certification. Current quest: figure out how to prove a quantum device does what it claims.</p>
+        </div></li>
+        <li class="quest done"><div>
+          <div class="qhead"><h3>Singapore</h3><span class="when">2023 – 2025</span></div>
+          <p>Taught superconducting qubits to cool themselves down. Shipped code to Qibo and ran experiments on real chips.</p>
+          <div class="chips loot"><span class="chip violet">1 preprint</span><span class="chip rose">1 PRR</span><span class="chip mint">open source</span></div>
+        </div></li>
+        <li class="quest done"><div>
+          <div class="qhead"><h3>Oxford</h3><span class="when">2018 – 2022</span></div>
+          <p>MPhys in Physics. Mapped where stars were born in Andromeda; ran the Vietnamese Society; showed prospective students around the department.</p>
+        </div></li>
+        <li class="quest done"><div>
+          <div class="qhead"><h3>Brighton</h3><span class="when">2016 – 2018</span></div>
+          <p>A-levels by the sea. Collected two olympiad golds along the way.</p>
+          <div class="chips loot"><span class="chip yellow">BPhO gold</span><span class="chip yellow">BMO gold</span></div>
+        </div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===== Side projects ===== -->
+  <section id="projects">
+    <h2>Side projects</h2>
+    <div class="projects">
+      <article class="panel project wide">
+        <div class="shot"><img src="assets/img/habit-kitty.png" alt="Habit Kitty: a pixel-art room with two cats, a cactus and a window" loading="lazy"></div>
+        <div class="body">
+          <div class="head"><span data-sprite="cat" data-scale="1"></span><h3>Habit Kitty</h3></div>
+          <p class="small">A cosy habit tracker where every habit is a cat. Keep your streaks and they move into your room; skip a day and they get hungry. This page is built with its design system.</p>
+          <div class="chips"><span class="chip rose">pixel art</span><span class="chip blue">web app</span></div>
+          <div class="links">
+            <a class="btn small primary" href="https://github.com/khanhuyengiang/habit-kitty/releases/download/v0.3.0/HabitKitty.apk">Download the APK (v0.3.0)</a>
+            <a class="btn small" href="https://github.com/khanhuyengiang/habit-kitty" target="_blank" rel="noopener">Source on GitHub</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- <article class="panel project">
+        <div class="shot empty">screenshot soon</div>
+        <div class="head"><span data-sprite="qubit" data-scale="1"></span><h3>Project two</h3></div>
+        <p class="small">Placeholder. A short line about what it is and why you made it.</p>
+        <div class="chips"><span class="chip violet">tag</span><span class="chip mint">tag</span></div>
+        <div class="links"><a class="btn small" href="#">Have a look</a></div>
+      </article>
+
+      <article class="panel project">
+        <div class="shot empty">screenshot soon</div>
+        <div class="head"><span data-sprite="star" data-scale="1"></span><h3>Project three</h3></div>
+        <p class="small">Placeholder. Could be a talk, a blog post, a tool or a drawing.</p>
+        <div class="chips"><span class="chip yellow">tag</span><span class="chip blue">tag</span></div>
+        <div class="links"><a class="btn small" href="#">Have a look</a></div>
+      </article> -->
+    </div>
+  </section>
+
+  <!-- ===== Now ===== -->
+  <section id="now">
+    <h2>Right now</h2>
+    <div class="two">
+      <div class="panel">
+        <h3>Currently</h3>
+        <ul class="now-list">
+          <!-- <li><span data-sprite="book" data-scale="1"></span><div><b>Reading</b>a book title goes here</div></li>
+          <li><span data-sprite="note" data-scale="1"></span><div><b>Listening</b>?</div></li> -->
+          <li><span data-sprite="sprout" data-scale="1"></span><div><b>Learning</b>German</div></li>
+          <li><span data-sprite="home" data-scale="1"></span><div><b>Exploring</b>Frankfurt</div></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Fun facts</h3>
+        <ul class="facts">
+          <li>Studied galaxies before switching to qubits.</li>
+          <li>Has run code on quantum chips in Singapore and Abu Dhabi.</li>
+          <li>Has a 10-year-old white cat named Mup. Say hi!</li>
+        </ul>
+        <p class="note-warn">Say hi: <a href="mailto:khanh.giang@tu-darmstadt.de">email</a> · <a href="https://github.com/khanhuyengiang">GitHub</a></p>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot muted">made with <span data-sprite="heart" data-scale="1"></span> and a lot of tiny squares · <a href="./">back to the serious page</a></p>
+</div>
+
+<nav class="nav" aria-label="Sections">
+  <ul>
+    <li><a href="#me"><span data-sprite="miniCat" data-scale="1"></span>Me</a></li>
+    <li><a href="#quests"><span data-sprite="star" data-scale="1"></span>Quests</a></li>
+    <li><a href="#projects"><span data-sprite="qubit" data-scale="1"></span>Projects</a></li>
+    <li><a href="#now"><span data-sprite="sprout" data-scale="1"></span>Now</a></li>
+    <li><a href="./"><span data-sprite="book" data-scale="1"></span>Academic</a></li>
+  </ul>
+</nav>
+
+<script src="assets/play.js"></script>
+</body>
+</html>
