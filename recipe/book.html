@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kay's Recipe Book</title>
+  <meta name="description" content="Kay's recipes as cooking tables: every ingredient down the side, every step across the top.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 6' shape-rendering='crispEdges'><path fill='%23ff8fb8' d='M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z'/></svg>">
+  <link rel="preload" href="../assets/fonts/jersey15-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="recipes.jsonl" as="fetch" crossorigin>
+  <link rel="stylesheet" href="../assets/css/play.css">
+  <link rel="stylesheet" href="recipe.css">
+  <script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>Recipe <span>Book</span></h1>
+    <div class="actions">
+      <a class="btn small" href="../play.html">← Playground</a>
+      <button class="btn small" id="theme" type="button">Dark</button>
+    </div>
+  </header>
+
+  <p class="small muted intro">Things I actually cook, written as tables: ingredients down the side, steps across the top. Read a column to see what goes in at each step. Want your own? <a href="./">Make a table</a>.</p>
+
+  <div class="panel book-picker">
+    <label class="field inline">Find
+      <input id="find" type="search" placeholder="lemon, beef, ribs…" autocomplete="off"></label>
+    <nav class="chips book-toc" id="toc" aria-label="Recipes"></nav>
+    <p class="tiny muted" id="find-none" hidden>No recipe matches that.</p>
+  </div>
+
+  <div class="book" id="book" aria-live="polite">
+    <p class="muted small">Loading recipes…</p>
+  </div>
+
+  <p class="foot muted">made with <span data-sprite="heart" data-scale="1"></span> and a pressure cooker · <a href="../play.html">back to the playground</a></p>
+</div>
+
+<script src="../assets/play.js"></script>
+<script src="table.js"></script>
+<script src="book.js"></script>
+</body>
+</html>

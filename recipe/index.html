@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recipe Table Maker</title>
+  <meta name="description" content="Type in ingredients and steps, get a cooking table that shows which ingredients go into each step.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 6' shape-rendering='crispEdges'><path fill='%23ff8fb8' d='M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z'/></svg>">
+  <link rel="preload" href="../assets/fonts/jersey15-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../assets/css/play.css">
+  <link rel="stylesheet" href="recipe.css">
+  <script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>Recipe <span>Table</span></h1>
+    <div class="actions">
+      <a class="btn small" href="../play.html">← Playground</a>
+      <button class="btn small" id="theme" type="button">Dark</button>
+    </div>
+  </header>
+
+  <p class="small muted intro">List the ingredients, then say which ones each step uses. The table puts each step in its own column and stretches every instruction across the ingredients it touches.</p>
+
+  <div class="panel toolbar">
+    <a class="btn small" href="book.html">Start from a recipe in the book</a>
+    <div class="row-btns">
+      <button class="btn small" id="import" type="button">Import JSON</button>
+      <input type="file" id="import-file" accept=".json,.jsonl,.txt,application/json" hidden>
+      <button class="btn small" id="clear" type="button">Start over</button>
+    </div>
+  </div>
+
+  <section id="recipe">
+    <h2>1 · Recipe</h2>
+    <div class="panel">
+      <label class="field">Title <input id="title" type="text" placeholder="Lemon bars"></label>
+      <label class="field">Preparation <span class="muted tiny">optional, shown above the table</span>
+        <input id="prep" type="text" placeholder="Preheat the oven to 175 °C"></label>
+    </div>
+  </section>
+
+  <section id="ingredients">
+    <h2>2 · Ingredients</h2>
+    <div class="panel">
+      <p class="tiny muted">One box per ingredient. Press Enter inside a box for a second line, like “(diced)”.</p>
+      <ol class="ing-list" id="ing-list"></ol>
+      <div class="row-btns">
+        <button class="btn small primary" id="add-ing" type="button">+ Ingredient</button>
+        <button class="btn small" id="paste-toggle" type="button" aria-expanded="false">Paste a list</button>
+      </div>
+      <div class="paste" id="paste" hidden>
+        <label class="field">One ingredient per line
+          <textarea id="paste-text" rows="6" placeholder="240 g flour&#10;3 g salt&#10;170 g butter"></textarea></label>
+        <button class="btn small primary" id="paste-add" type="button">Add these</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="steps">
+    <h2>3 · Steps</h2>
+    <p class="tiny muted">Each step is a column. Click the ingredients a step uses (shift-click picks a range). Things done at the same time, like melting butter while you whisk the flour, go in the same step as separate actions.</p>
+    <div class="step-list" id="step-list"></div>
+    <div class="row-btns"><button class="btn small primary" id="add-step" type="button">+ Step</button></div>
+  </section>
+
+  <section id="sections">
+    <h2>4 · Groups <span class="muted tiny">optional</span></h2>
+    <div class="panel">
+      <p class="tiny muted">Label a run of ingredients, like “Crust” and “Filling”. The label runs down the left edge of the table.</p>
+      <div class="sec-list" id="sec-list"></div>
+      <div class="row-btns"><button class="btn small" id="add-sec" type="button">+ Group</button></div>
+    </div>
+  </section>
+
+  <section id="output">
+    <h2>5 · Table</h2>
+    <div class="panel">
+      <div class="row-btns">
+        <button class="btn small primary" id="compile" type="button">Compile</button>
+        <button class="btn small" id="undo-compile" type="button" hidden>Undo compile</button>
+        <span class="tiny muted" id="compile-note" role="status">reorders the ingredients so each step and group stays in one piece</span>
+      </div>
+      <div class="row-btns">
+        <button class="btn small" id="copy-html" type="button">Copy HTML</button>
+        <button class="btn small" id="copy-link" type="button">Copy share link</button>
+        <button class="btn small" id="download" type="button">Download JSON</button>
+        <button class="btn small" id="print" type="button">Print</button>
+        <span class="status tiny muted" id="status" role="status"></span>
+      </div>
+      <div id="warnings"></div>
+      <div class="preview" id="preview"></div>
+    </div>
+  </section>
+
+  <p class="foot muted">made with <span data-sprite="heart" data-scale="1"></span> and too many lemons · <a href="../play.html">back to the playground</a></p>
+</div>
+
+<script src="../assets/play.js"></script>
+<script src="table.js"></script>
+<script src="recipe.js"></script>
+</body>
+</html>

@@ -6,9 +6,7 @@
   <title>Kays's Playground</title>
   <meta name="description" content="The informal side of Khanh Uyen Giang: side projects, pixel art and a character-sheet CV.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 6' shape-rendering='crispEdges'><path fill='%23ff8fb8' d='M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z'/></svg>">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+15&display=swap">
+  <link rel="preload" href="assets/fonts/jersey15-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/play.css">
   <script>try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}</script>
 </head>
@@ -111,7 +109,7 @@
     <h2>Side projects</h2>
     <div class="projects">
       <article class="panel project wide">
-        <div class="shot"><img src="assets/img/habit-kitty.png" alt="Habit Kitty: a pixel-art room with two cats, a cactus and a window" loading="lazy"></div>
+        <div class="shot"><img src="assets/img/habit-kitty.webp" alt="Habit Kitty: a pixel-art room with two cats, a cactus and a window" width="780" height="1688" loading="lazy" decoding="async"></div>
         <div class="body">
           <div class="head"><span data-sprite="cat" data-scale="1"></span><h3>Habit Kitty</h3></div>
           <p class="small">A cosy habit tracker where every habit is a cat. Keep your streaks and they move into your room; skip a day and they get hungry. This page is built with its design system.</p>
@@ -119,6 +117,22 @@
           <div class="links">
             <a class="btn small primary" href="https://github.com/khanhuyengiang/habit-kitty/releases/download/v0.3.0/HabitKitty.apk">Download the APK (v0.3.0)</a>
             <a class="btn small" href="https://github.com/khanhuyengiang/habit-kitty" target="_blank" rel="noopener">Source on GitHub</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel project wide stack">
+        <a class="shot" href="recipe/book.html#lemon-bars"><picture>
+          <source media="(max-width: 719px)" srcset="assets/img/recipe-table-narrow.webp" width="421" height="353">
+          <img src="assets/img/recipe-table.webp" alt="Part of the Lemon Bars recipe table: crust ingredients down the side, steps across the top, each instruction stretched over the ingredients it uses" width="759" height="353" loading="lazy" decoding="async">
+        </picture></a>
+        <div class="body">
+          <div class="head"><span data-sprite="heart" data-scale="1"></span><h3>Recipe Table</h3></div>
+          <p class="small">Type in the ingredients and steps of a recipe and get one table showing which ingredients go into each step. Copy it as HTML for your notes, print it, or share a link.</p>
+          <div class="chips"><span class="chip yellow">cooking</span><span class="chip blue">web app</span></div>
+          <div class="links">
+            <a class="btn small primary" href="recipe/">Make a table</a>
+            <a class="btn small" href="recipe/book.html">Browse my recipe book</a>
           </div>
         </div>
       </article>
