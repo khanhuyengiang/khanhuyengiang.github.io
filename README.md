@@ -14,6 +14,9 @@ recipe/
   table.js            draws a recipe as an HTML table (used by both pages)
   compile.js          reorders ingredients so each step stays in one piece (loaded on first Compile)
   recipe.css          styles for both recipe pages, on top of assets/css/play.css
+qsq-demo/
+  index.html          interactive √X characterisation demo (RB, QSQ, QPT, GST)    demo.js, demo.css
+  data.json           100 precomputed noise draws; regenerate with qsq's scripts/examples/web_demo_data.py
 assets/
   fonts/              self-hosted fonts (Inter, Newsreader, Jersey 15), declared at the top of each stylesheet
   img/                images (WebP; recipe-table*.webp are 2x captures of the book, a wide and a phone crop)

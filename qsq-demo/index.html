@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Characterising a Noisy √X Gate</title>
+  <meta name="description" content="Interactive comparison of RB, QSQ, QPT and GST on a simulated noisy sqrt(X) gate: draw a noise configuration, choose protocols and shot budgets, and compare fidelities and Pauli transfer matrices.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='4' fill='%23ece6fc'/><circle cx='8' cy='8' r='3.5' fill='%23ff8fb8'/></svg>">
+  <link rel="preload" href="../assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../assets/fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../assets/css/academic.css">
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+<main class="demo">
+
+  <header>
+    <a class="back" href="../">← Khanh Uyen Giang</a>
+    <h1>One noisy √X gate, many ways to benchmark it</h1>
+    <p class="lead">
+      Draw a realistic noise configuration for a simulated superconducting qubit, then estimate the fidelity of its
+      √X gate with randomised benchmarking (RB), Quantum System Quizzing (QSQ), 
+      quantum process tomography (QPT) and gate set tomography (GST), and compare each
+      estimate with the truth.
+    </p>
+  </header>
+
+  <!-- ===== 1. Noise ===== -->
+  <section id="noise">
+    <h2>Draw a noise configuration</h2>
+    <p class="hint">Each draw has amplitude damping, dephasing and readout error, as a provider would report them, plus one hidden gate error that no calibration report shows.</p>
+    <div class="row">
+      <button class="btn" id="draw" type="button" disabled>Loading…</button>
+      <span class="draw-id" id="draw-id"></span>
+    </div>
+    <div class="cards" id="noise-cards" hidden>
+      <div class="panel">
+        <h3>Reported qubit parameters</h3>
+        <dl class="params" id="reported"></dl>
+      </div>
+      <div class="panel">
+        <h3>Hidden gate noise</h3>
+        <ul class="noise" id="hidden"></ul>
+        <div class="truth-box" id="truth"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 2. Experiment ===== -->
+  <section id="setup">
+    <h2>Choose the experiment</h2>
+    <fieldset>
+      <legend>Protocols <button class="mini" id="all" type="button">all</button><button class="mini" id="none" type="button">none</button></legend>
+      <div class="chips" id="protocols"></div>
+      <details class="seqs">
+        <summary>Sequences of the QSQ sets</summary>
+        <div id="seqs"></div>
+      </details>
+    </fieldset>
+    <fieldset class="shots">
+      <legend>Shots</legend>
+      <label class="mode"><input type="radio" name="mode" value="per" checked> Same shots for every circuit
+        <span class="seg" data-mode="per"><button type="button" data-shots="1000" aria-pressed="true">1,000</button><button type="button" data-shots="3000" aria-pressed="false">3,000</button></span>
+        <span class="draw-id">per circuit</span></label>
+      <label class="mode"><input type="radio" name="mode" value="total"> Same total budget for every protocol
+        <span class="seg off" data-mode="total"><button type="button" data-shots="50000" aria-pressed="true">50,000</button><button type="button" data-shots="200000" aria-pressed="false">200,000</button></span>
+        <span class="draw-id">shots, split evenly over its circuits</span></label>
+    </fieldset>
+    <div class="row">
+      <button class="btn" id="run-fid" type="button" disabled>Run fidelity check</button>
+      <button class="btn secondary" id="run-ptm" type="button" disabled>Run PTM check</button>
+    </div>
+  </section>
+
+  <!-- ===== 3. Fidelities ===== -->
+  <section id="fidelity" hidden>
+    <div class="results-head">
+      <h2>Estimated infidelity</h2>
+      <div class="row">
+        <label class="toggle"><input type="checkbox" id="errorbars" checked> Error bars</label>
+        <label class="toggle"><input type="checkbox" id="logscale"> Log scale</label>
+      </div>
+    </div>
+    <p class="hint">Each bar runs from the true infidelity (horizontal line) to the estimate, so its length is the error. Error bars are one standard deviation. Under each name: circuits × shots per circuit.</p>
+    <div class="chart-legend" id="fid-legend"></div>
+    <div class="scroll"><div id="fid-chart"></div></div>
+    <details class="table">
+      <summary>Show as a table</summary>
+      <div class="scroll"><table class="values" id="fid-table"></table></div>
+    </details>
+  </section>
+
+  <!-- ===== 4. PTMs ===== -->
+  <section id="ptm" hidden>
+    <div class="results-head">
+      <h2>Pauli transfer matrices</h2>
+      <span class="seg" id="ptm-view" role="group" aria-label="Matrix view"><button type="button" data-view="ptm" aria-pressed="true">PTM</button><button type="button" data-view="residual" aria-pressed="false">PTM residual</button></span>
+    </div>
+    <p class="hint">All matrices are in the gate's own Schur frame, which for √X is the usual I, X, Y, Z basis. <b>PTM</b> shows each estimate next to the ideal and true matrices; <b>PTM residual</b> shows each estimate minus the true matrix, on its own colour scale. RB has no PTM. QSQ returns only the gauge-invariant eigenvalues, and cannot see the sign of the over-rotation entry <i>a</i> (the Y–Y and Z–Z entries), so its panels show |<i>a</i>| and are compared with the truth folded the same way.</p>
+    <div class="scale" id="ptm-scale"></div>
+    <div id="ptm-grid" class="ptm-grid"></div>
+  </section>
+
+  <section>
+    <h2>What to look for</h2>
+    <ul class="notes">
+      <li><strong>QPT</strong> assumes perfect state preparation and readout, so readout error ends up in the gate and it usually reports a far worse gate than the true one. <strong>Long-sequence QPT</strong> repeats the gate up to 257 times, which spreads that error thinly.</li>
+      <li><strong>GST</strong> fits preparation, readout and gates together. <strong>Short GST</strong> (no repeated germs) has no amplification, so a 0.1% error can sit below its shot noise.</li>
+      <li><strong>RB</strong> ignores readout error, but its per-gate number averages √X with √Y. A coherent over-rotation of √X makes <strong>interleaved RB</strong> overestimate the error.</li>
+      <li><strong>QSQ</strong> regressors map the failure rates of a few repeated-gate sequences to the gate's eigenvalues. The sets differ in which sequences they use: greedy 8 and 15, greedy with shorter sequences preferred, a structured ladder of lengths, and a 26-sequence baseline.</li>
+    </ul>
+  </section>
+
+  <div class="demo-foot">
+    Simulated with <a href="https://pypi.org/project/qsq/">qsq</a>. The 100 noise draws and every estimate were computed ahead of time with the same code as the package's comparison notebook; this page only picks a draw and plots it.
+  </div>
+</main>
+
+<div class="tip" id="tip" role="tooltip"></div>
+<script src="demo.js"></script>
+</body>
+</html>

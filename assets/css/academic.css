@@ -161,6 +161,7 @@ main h2::before {
 }
 #news h2 { --dot: var(--pink-strong); }
 #publications h2 { --dot: var(--blue-strong); }
+#demo h2 { --dot: var(--blue-strong); }
 #docs h2 { --dot: var(--pink-strong); }
 #education h2 { --dot: var(--pink-strong); }
 #more h2 { --dot: var(--blue-strong); }
