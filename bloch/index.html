@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bloch Sphere Playground</title>
+  <meta name="description" content="Interactive Bloch sphere: pick one of the six Pauli eigenstates, apply single-qubit gates and rotations, define your own gates, and measure in the X, Y or Z basis.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='4' fill='%23ece6fc'/><circle cx='8' cy='8' r='3.5' fill='%23ff8fb8'/></svg>">
+  <link rel="preload" href="../assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../assets/fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../assets/css/academic.css">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
+  <link rel="stylesheet" href="bloch.css">
+</head>
+<body>
+<main class="bloch">
+
+  <header>
+    <a class="back" href="../">← Khanh Uyen Giang</a>
+    <h1>Bloch sphere playground</h1>
+    <p class="lead">
+      Start from one of the six Pauli eigenstates, apply single-qubit gates and watch the state move on the sphere,
+      then measure it in the X, Y or Z basis. Drag the sphere to turn it; double-click to reset the view.
+    </p>
+  </header>
+
+  <!-- ===== Sequence line ===== -->
+  <section class="seq-bar" aria-label="Gate sequence">
+    <div class="seq-line">
+      <span class="seq-label">Sequence</span>
+      <div class="seq" id="seq" role="status"></div>
+    </div>
+    <div class="row">
+      <button class="btn secondary small" id="undo" type="button">Undo</button>
+      <button class="btn secondary small" id="reset" type="button">Reset</button>
+      <button class="btn secondary small" id="copy" type="button">Copy</button>
+    </div>
+  </section>
+
+  <div class="layout-2">
+
+    <!-- ===== Sphere and readout ===== -->
+    <div class="sphere-col">
+      <div class="sphere-wrap" id="sphere-wrap">
+        <canvas id="sphere" role="img" aria-label="Bloch sphere showing the current qubit state. The state is also given as text below."></canvas>
+      </div>
+      <div class="panel readout">
+        <dl class="params" id="readout"></dl>
+        <p class="net" id="net"></p>
+      </div>
+    </div>
+
+    <!-- ===== Controls ===== -->
+    <div class="controls">
+
+      <section class="panel">
+        <h2>Initial state</h2>
+        <div class="chips" id="init" role="radiogroup" aria-label="Initial state"></div>
+        <p class="hint">Changing the initial state clears the sequence.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Gates</h2>
+        <div class="gates" id="gates"></div>
+        <div id="my-gates-wrap" hidden>
+          <h3>Your gates</h3>
+          <div class="gates" id="my-gates"></div>
+        </div>
+        <p class="hint"><span data-tex="S_x = \sqrt{X}"></span>, <span data-tex="S_y = \sqrt{Y}"></span>. Hover a gate to see its matrix.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Measurement probabilities</h2>
+        <div class="seg" role="radiogroup" aria-label="Measurement basis" id="basis">
+          <label><input type="radio" name="basis" value="X"> <span>X basis</span></label>
+          <label><input type="radio" name="basis" value="Y"> <span>Y basis</span></label>
+          <label><input type="radio" name="basis" value="Z" checked> <span>Z basis</span></label>
+        </div>
+        <div class="probs" id="probs"></div>
+      </section>
+
+      <!-- ===== More tools (collapsed by default) ===== -->
+      <details class="more" id="more">
+        <summary><h2>More tools</h2><span class="sub">Rotations, your own gates, measuring and sampling</span></summary>
+
+        <section class="panel">
+          <h3>Rotations</h3>
+          <p class="hint"><span data-tex="R_{\hat n}(\theta) = e^{-i\theta\,\hat n\cdot\vec\sigma/2}"></span>, with <span data-tex="\theta"></span> in radians. Type expressions such as <code>pi/4</code>, <code>2pi/3</code> or <code>0.3</code>.</p>
+          <div class="rots" id="rots"></div>
+          <p class="err" id="rot-err" role="alert"></p>
+        </section>
+
+        <section class="panel" id="define">
+          <h3>Define a gate</h3>
+          <p class="hint">Saved gates are stored in this browser only. Entries accept complex expressions: <code>i</code>, <code>pi</code>, <code>sqrt(2)</code>, <code>exp(i pi/4)</code>, <code>1/√2</code>. Names may have a subscript and a dagger: <code>R_a</code> shows as <span data-tex="\mathrm{R}_{a}"></span>, <code>V†</code> as <span data-tex="V^\dagger"></span>.</p>
+          <div class="row">
+            <label class="field">Name <input id="g-name" maxlength="12" placeholder="e.g. sqrtT" autocomplete="off"></label>
+          </div>
+          <div class="seg" role="radiogroup" aria-label="Define gate by">
+            <label><input type="radio" name="g-mode" value="matrix" checked> <span>Matrix</span></label>
+            <label><input type="radio" name="g-mode" value="rot"> <span>Axis and angle</span></label>
+          </div>
+          <div id="g-matrix" class="matrix">
+            <input id="m00" value="1" aria-label="Row 1, column 1">
+            <input id="m01" value="0" aria-label="Row 1, column 2">
+            <input id="m10" value="0" aria-label="Row 2, column 1">
+            <input id="m11" value="exp(i pi/8)" aria-label="Row 2, column 2">
+          </div>
+          <div id="g-rot" class="axis" hidden>
+            <label class="field"><span data-tex="n_x"></span> <input id="nx" value="1" aria-label="n_x"></label>
+            <label class="field"><span data-tex="n_y"></span> <input id="ny" value="0" aria-label="n_y"></label>
+            <label class="field"><span data-tex="n_z"></span> <input id="nz" value="1" aria-label="n_z"></label>
+            <label class="field"><span data-tex="\theta"></span> <input id="ang" value="pi" aria-label="angle"></label>
+          </div>
+          <p class="err" id="g-err" role="alert"></p>
+          <div class="row">
+            <button class="btn small" id="g-save" type="button">Save gate</button>
+            <button class="btn secondary small" id="g-try" type="button">Apply once</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Measure</h3>
+          <p class="hint">Uses the basis chosen under Measurement probabilities, currently <span id="basis-now"></span>.</p>
+          <div class="row">
+            <button class="btn small" id="measure" type="button">Measure once (collapses)</button>
+          </div>
+          <div class="row shots-row">
+            <label class="field">Shots <input id="shots" type="number" min="1" max="100000" value="1000"></label>
+            <button class="btn secondary small" id="sample" type="button">Sample</button>
+          </div>
+          <div class="probs" id="counts"></div>
+        </section>
+      </details>
+
+    </div>
+  </div>
+
+  <p class="credit">
+    Inspired by <a href="https://github.com/kherb27/Blochy">Blochy</a> by Konstantin (kherb27).
+    This version is a separate implementation that adds the X/Y eigenstates, a fixed gate set, user-defined gates, a sequence line and measurement in any Pauli basis.
+  </p>
+</main>
+
+<script src="../assets/katex/katex.min.js"></script>
+<script src="bloch.js"></script>
+</body>
+</html>

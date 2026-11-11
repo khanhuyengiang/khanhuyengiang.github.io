@@ -17,7 +17,11 @@ recipe/
 qsq-demo/
   index.html          interactive √X characterisation demo (RB, QSQ, QPT, GST)    demo.js, demo.css
   data.json           100 precomputed noise draws; regenerate with qsq's scripts/examples/web_demo_data.py
+bloch/
+  index.html          Bloch sphere playground (gates, rotations, custom gates, X/Y/Z measurement)    bloch.js, bloch.css
+                      inspired by Blochy (github.com/kherb27/Blochy, MIT) but written from scratch; no dependencies
 assets/
+  katex/              KaTeX 0.16.11 (MIT, LICENSE inside), self-hosted: min js/css + woff2 fonts only; used by bloch/
   fonts/              self-hosted fonts (Inter, Newsreader, Jersey 15), declared at the top of each stylesheet
   img/                images (WebP; recipe-table*.webp are 2x captures of the book, a wide and a phone crop)
   Khanh_Giang_CV.pdf  the downloadable CV
