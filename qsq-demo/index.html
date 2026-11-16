@@ -12,6 +12,7 @@
   <link rel="preload" href="../assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../assets/css/academic.css">
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
   <link rel="stylesheet" href="demo.css">
 </head>
 <body>
@@ -19,19 +20,128 @@
 
   <header>
     <a class="back" href="../">← Khanh Uyen Giang</a>
-    <h1>One noisy √X gate, many ways to benchmark it</h1>
+    <h1>One noisy \(\sqrt{X}\) gate, many ways to benchmark it</h1>
     <p class="lead">
       Draw a realistic noise configuration for a simulated superconducting qubit, then estimate the fidelity of its
-      √X gate with randomised benchmarking (RB), Quantum System Quizzing (QSQ), 
+      \(\sqrt{X}\) gate with randomised benchmarking (RB), Quantum System Quizzing (QSQ), 
       quantum process tomography (QPT) and gate set tomography (GST), and compare each
       estimate with the truth.
     </p>
   </header>
 
+  <!-- ===== 0. How QSQ works ===== -->
+  <section id="how">
+    <h2>How QSQ works</h2>
+    <p class="hint">QSQ runs a handful of short circuits that repeat the gate, records how often each one ends in the wrong outcome, and hands those failure rates to a machine-learning model. The model was trained beforehand on classical simulations of many noise models, where the true gate is known, and returns the gate's Pauli transfer matrix (PTM), from which its fidelity follows.</p>
+    <figure class="pipeline">
+      <svg class="pl-defs" width="0" height="0" aria-hidden="true">
+        <defs>
+          <marker id="pl-h" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="pl-head" d="M1 1 9 5 1 9z"/></marker>
+          <marker id="pl-ht" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="pl-head-t" d="M1 1 9 5 1 9z"/></marker>
+          <g id="pl-meter"><rect class="pl-meter" x="-11" y="-9" width="22" height="18" rx="3"/><path class="pl-needle" d="M-7 5a7 7 0 0 1 14 0M0 5l5-8"/></g>
+        </defs>
+      </svg>
+      <!-- wide layout -->
+      <svg class="pl-wide" viewBox="0 0 780 336" role="img" aria-labelledby="pl-desc">
+        <title id="pl-desc">QSQ pipeline: short circuits run on the QPU give one failure rate each; a regressor trained on classical simulations of many noise models maps the failure-rate vector to the nine Schur parameters of the gate's Pauli transfer matrix, from which its spectrum and fidelity follow.</title>
+        <path class="pl-train" d="M91 252V298H208" marker-end="url(#pl-ht)"/>
+        <path class="pl-train" d="M506 298H534V178" marker-end="url(#pl-ht)"/>
+        <text class="pl-tag" x="526" y="232" text-anchor="end">trains</text>
+        <rect class="pl-panel" x="1" y="10" width="180" height="240" rx="14"/>
+        <text class="pl-title" x="91" y="40" text-anchor="middle">Circuits</text>
+        <foreignObject x="1" y="46" width="180" height="18" class="fo fo-sub"><div xmlns="http://www.w3.org/1999/xhtml"><span>prepare \(\lvert 0\rangle\), apply, measure \(Z\)</span></div></foreignObject>
+        <g transform="translate(0 84)"><foreignObject x="2" y="-10" width="32" height="20" class="fo fo-ket"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\lvert 0\rangle\)</span></div></foreignObject><line class="pl-wire" x1="34" x2="150" y1="0" y2="0"/><use href="#pl-meter" x="162"/></g>
+        <g transform="translate(0 118)"><foreignObject x="2" y="-10" width="32" height="20" class="fo fo-ket"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\lvert 0\rangle\)</span></div></foreignObject><line class="pl-wire" x1="34" x2="150" y1="0" y2="0"/><rect class="pl-g" x="52" y="-11" width="24" height="22" rx="4"/><foreignObject x="52" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><rect class="pl-g" x="82" y="-11" width="24" height="22" rx="4"/><foreignObject x="82" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><use href="#pl-meter" x="162"/></g>
+        <g transform="translate(0 152)"><foreignObject x="2" y="-10" width="32" height="20" class="fo fo-ket"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\lvert 0\rangle\)</span></div></foreignObject><line class="pl-wire" x1="34" x2="150" y1="0" y2="0"/><rect class="pl-g" x="38" y="-11" width="24" height="22" rx="4"/><foreignObject x="38" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><rect class="pl-g" x="64" y="-11" width="24" height="22" rx="4"/><foreignObject x="64" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><rect class="pl-g" x="90" y="-11" width="24" height="22" rx="4"/><foreignObject x="90" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><rect class="pl-g" x="116" y="-11" width="24" height="22" rx="4"/><foreignObject x="116" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><use href="#pl-meter" x="162"/></g>
+        <text class="pl-dots" x="91" y="190" text-anchor="middle">⋮</text>
+        <g transform="translate(0 222)"><foreignObject x="2" y="-10" width="32" height="20" class="fo fo-ket"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\lvert 0\rangle\)</span></div></foreignObject><line class="pl-wire" x1="34" x2="150" y1="0" y2="0"/><rect class="pl-g pl-h" x="44" y="-11" width="24" height="22" rx="4"/><foreignObject x="44" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(H\)</span></div></foreignObject><rect class="pl-g" x="74" y="-11" width="24" height="22" rx="4"/><foreignObject x="74" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><rect class="pl-g pl-h" x="104" y="-11" width="24" height="22" rx="4"/><foreignObject x="104" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(H\)</span></div></foreignObject><use href="#pl-meter" x="162"/></g>
+        <path class="pl-arrow" d="M187 130H208" marker-end="url(#pl-h)"/>
+        <rect class="pl-qpu" x="216" y="92" width="88" height="76" rx="14"/>
+        <text class="pl-title pl-inv" x="260" y="128" text-anchor="middle">QPU</text>
+        <foreignObject x="216" y="138" width="88" height="18" class="fo fo-sub fo-inv"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(N\) shots each</span></div></foreignObject>
+        <path class="pl-arrow" d="M310 130H330" marker-end="url(#pl-h)"/>
+        <rect class="pl-panel" x="338" y="10" width="110" height="240" rx="14"/>
+        <foreignObject x="338" y="22" width="110" height="24" class="fo fo-title fo-sm fo-xs"><div xmlns="http://www.w3.org/1999/xhtml"><span>Failure rates \(\mathbf{p}\)</span></div></foreignObject>
+        <foreignObject x="338" y="46" width="110" height="18" class="fo fo-sub"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(P(\text{wrong outcome})\)</span></div></foreignObject>
+        <text class="pl-num" x="393" y="89" text-anchor="middle">0.012</text>
+        <text class="pl-num" x="393" y="123" text-anchor="middle">0.031</text>
+        <text class="pl-num" x="393" y="157" text-anchor="middle">0.047</text>
+        <text class="pl-dots" x="393" y="190" text-anchor="middle">⋮</text>
+        <text class="pl-num" x="393" y="227" text-anchor="middle">0.019</text>
+        <path class="pl-arrow" d="M454 130H474" marker-end="url(#pl-h)"/>
+        <rect class="pl-model" x="482" y="92" width="104" height="76" rx="14"/>
+        <text class="pl-title pl-md" x="534" y="126" text-anchor="middle">ML model</text>
+        <foreignObject x="482" y="138" width="104" height="18" class="fo fo-sub"><div xmlns="http://www.w3.org/1999/xhtml"><span>regressor \(\mathbf{p} \mapsto \Lambda\)</span></div></foreignObject>
+        <path class="pl-arrow" d="M592 112 614 88" marker-end="url(#pl-h)"/>
+        <path class="pl-arrow" d="M592 150 614 184" marker-end="url(#pl-h)"/>
+        <rect class="pl-out" x="622" y="10" width="156" height="168" rx="14"/>
+        <text class="pl-title pl-xs" x="700" y="35" text-anchor="middle">Pauli transfer matrix</text>
+        <foreignObject x="622" y="44" width="156" height="104" class="fo fo-mx"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\begin{pmatrix}\htmlClass{pl-z}{1} & \htmlClass{pl-z}{0} & \htmlClass{pl-z}{0} & \htmlClass{pl-z}{0}\\v_1 & \htmlClass{pl-e}{\lambda_0} & w_1 & w_2\\v_2 & \htmlClass{pl-z}{0} & a & \htmlClass{pl-e}{-b}\\v_3 & \htmlClass{pl-z}{0} & \htmlClass{pl-e}{c} & a\end{pmatrix}\)</span></div></foreignObject>
+        <foreignObject x="622" y="150" width="156" height="20" class="fo fo-sub fo-xs"><div xmlns="http://www.w3.org/1999/xhtml"><span>spectrum \(\{1,\ \lambda_0,\ a \pm i\sqrt{bc}\}\)</span></div></foreignObject>
+        <rect class="pl-out" x="622" y="188" width="156" height="62" rx="14"/>
+        <text class="pl-title pl-xs" x="700" y="211" text-anchor="middle">Fidelity</text>
+        <foreignObject x="622" y="218" width="156" height="28" class="fo fo-f fo-xs"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(F = \tfrac{1}{2} + \tfrac{1}{6}\,(\lambda_0 + |b| + |c|)\)</span></div></foreignObject>
+        <rect class="pl-sim" x="216" y="262" width="290" height="72" rx="14"/>
+        <text class="pl-title pl-sm" x="361" y="284" text-anchor="middle">Classical simulations</text>
+        <foreignObject x="216" y="290" width="290" height="18" class="fo fo-sub"><div xmlns="http://www.w3.org/1999/xhtml"><span>many noise models: \(T_1\), \(T_2\), readout + one gate error</span></div></foreignObject>
+        <foreignObject x="216" y="308" width="290" height="18" class="fo fo-sub"><div xmlns="http://www.w3.org/1999/xhtml"><span>\({\sim}10^5\) draws, true PTM known \(\to\) pairs \((\mathbf{p}, \Lambda)\)</span></div></foreignObject>
+        </svg>
+
+      <!-- narrow layout -->
+      <svg class="pl-narrow" viewBox="0 0 340 920" role="img" aria-labelledby="pl-desc2">
+        <title id="pl-desc2">QSQ pipeline: short circuits run on the QPU give one failure rate each; a regressor trained on classical simulations of many noise models maps the failure-rate vector to the nine Schur parameters of the gate's Pauli transfer matrix, from which its spectrum and fidelity follow.</title>
+        <path class="pl-train" d="M222 118H288V276" marker-end="url(#pl-ht)"/>
+        <path class="pl-train" d="M288 474V552H180" marker-end="url(#pl-ht)"/>
+        <text class="pl-tag" x="294" y="520">trains</text>
+        <rect class="pl-panel" x="1" y="1" width="220" height="234" rx="14"/>
+        <text class="pl-title" x="111" y="31" text-anchor="middle">Circuits</text>
+        <foreignObject x="1" y="37" width="220" height="18" class="fo fo-sub"><div xmlns="http://www.w3.org/1999/xhtml"><span>prepare \(\lvert 0\rangle\), apply, measure \(Z\)</span></div></foreignObject>
+        <g transform="translate(12 80)"><foreignObject x="2" y="-10" width="32" height="20" class="fo fo-ket"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\lvert 0\rangle\)</span></div></foreignObject><line class="pl-wire" x1="34" x2="160" y1="0" y2="0"/><use href="#pl-meter" x="172"/></g>
+        <g transform="translate(12 114)"><foreignObject x="2" y="-10" width="32" height="20" class="fo fo-ket"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\lvert 0\rangle\)</span></div></foreignObject><line class="pl-wire" x1="34" x2="160" y1="0" y2="0"/><rect class="pl-g" x="52" y="-11" width="24" height="22" rx="4"/><foreignObject x="52" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><rect class="pl-g" x="84" y="-11" width="24" height="22" rx="4"/><foreignObject x="84" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><use href="#pl-meter" x="172"/></g>
+        <g transform="translate(12 148)"><foreignObject x="2" y="-10" width="32" height="20" class="fo fo-ket"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\lvert 0\rangle\)</span></div></foreignObject><line class="pl-wire" x1="34" x2="160" y1="0" y2="0"/><rect class="pl-g" x="40" y="-11" width="24" height="22" rx="4"/><foreignObject x="40" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><rect class="pl-g" x="68" y="-11" width="24" height="22" rx="4"/><foreignObject x="68" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><rect class="pl-g" x="96" y="-11" width="24" height="22" rx="4"/><foreignObject x="96" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><rect class="pl-g" x="124" y="-11" width="24" height="22" rx="4"/><foreignObject x="124" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><use href="#pl-meter" x="172"/></g>
+        <text class="pl-dots" x="111" y="184" text-anchor="middle">⋮</text>
+        <g transform="translate(12 210)"><foreignObject x="2" y="-10" width="32" height="20" class="fo fo-ket"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\lvert 0\rangle\)</span></div></foreignObject><line class="pl-wire" x1="34" x2="160" y1="0" y2="0"/><rect class="pl-g pl-h" x="46" y="-11" width="24" height="22" rx="4"/><foreignObject x="46" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(H\)</span></div></foreignObject><rect class="pl-g" x="78" y="-11" width="24" height="22" rx="4"/><foreignObject x="78" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\sqrt{X}\)</span></div></foreignObject><rect class="pl-g pl-h" x="110" y="-11" width="24" height="22" rx="4"/><foreignObject x="110" y="-11" width="24" height="22" class="fo fo-gate"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(H\)</span></div></foreignObject><use href="#pl-meter" x="172"/></g>
+        <path class="pl-arrow" d="M111 242V274" marker-end="url(#pl-h)"/>
+        <rect class="pl-qpu" x="51" y="284" width="120" height="66" rx="14"/>
+        <text class="pl-title pl-inv" x="111" y="314" text-anchor="middle">QPU</text>
+        <foreignObject x="51" y="322" width="120" height="18" class="fo fo-sub fo-inv"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(N\) shots each</span></div></foreignObject>
+        <path class="pl-arrow" d="M111 358V384" marker-end="url(#pl-h)"/>
+        <rect class="pl-panel" x="1" y="394" width="220" height="80" rx="14"/>
+        <foreignObject x="1" y="404" width="220" height="24" class="fo fo-title fo-sm"><div xmlns="http://www.w3.org/1999/xhtml"><span>Failure rates \(\mathbf{p}\)</span></div></foreignObject>
+        <g class="pl-num" text-anchor="middle"><text x="32" y="456">0.012</text><text x="76" y="456">0.031</text><text x="120" y="456">0.047</text><text x="152" y="456">…</text><text x="188" y="456">0.019</text></g>
+        <path class="pl-arrow" d="M111 482V510" marker-end="url(#pl-h)"/>
+        <rect class="pl-model" x="51" y="520" width="120" height="66" rx="14"/>
+        <text class="pl-title" x="111" y="550" text-anchor="middle">ML model</text>
+        <foreignObject x="51" y="558" width="120" height="18" class="fo fo-sub"><div xmlns="http://www.w3.org/1999/xhtml"><span>regressor \(\mathbf{p} \mapsto \Lambda\)</span></div></foreignObject>
+        <rect class="pl-sim" x="236" y="284" width="104" height="190" rx="14"/>
+        <g class="pl-title pl-sm" text-anchor="middle"><text x="288" y="318">Classical</text><text x="288" y="338">simulations</text><text x="288" y="358">with many</text><text x="288" y="378">noise models</text></g>
+        <foreignObject x="236" y="390" width="104" height="16" class="fo fo-sub"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(T_1\), \(T_2\), readout</span></div></foreignObject>
+        <foreignObject x="236" y="406" width="104" height="16" class="fo fo-sub"><div xmlns="http://www.w3.org/1999/xhtml"><span>+ one gate error</span></div></foreignObject>
+        <foreignObject x="236" y="428" width="104" height="16" class="fo fo-sub"><div xmlns="http://www.w3.org/1999/xhtml"><span>true PTM known</span></div></foreignObject>
+        <foreignObject x="236" y="444" width="104" height="18" class="fo fo-sub"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\to (\mathbf{p}, \Lambda)\) pairs</span></div></foreignObject>
+        <path class="pl-arrow" d="M111 594V622" marker-end="url(#pl-h)"/>
+        <rect class="pl-out" x="1" y="632" width="338" height="170" rx="14"/>
+        <text class="pl-title pl-sm" x="170" y="658" text-anchor="middle">Pauli transfer matrix</text>
+        <foreignObject x="1" y="664" width="338" height="104" class="fo fo-mx"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(\begin{pmatrix}\htmlClass{pl-z}{1} & \htmlClass{pl-z}{0} & \htmlClass{pl-z}{0} & \htmlClass{pl-z}{0}\\v_1 & \htmlClass{pl-e}{\lambda_0} & w_1 & w_2\\v_2 & \htmlClass{pl-z}{0} & a & \htmlClass{pl-e}{-b}\\v_3 & \htmlClass{pl-z}{0} & \htmlClass{pl-e}{c} & a\end{pmatrix}\)</span></div></foreignObject>
+        <foreignObject x="1" y="772" width="338" height="20" class="fo fo-sub"><div xmlns="http://www.w3.org/1999/xhtml"><span>spectrum \(\{1,\ \lambda_0,\ a \pm i\sqrt{bc}\}\)</span></div></foreignObject>
+        <path class="pl-arrow" d="M170 810V832" marker-end="url(#pl-h)"/>
+        <rect class="pl-out" x="1" y="842" width="338" height="76" rx="14"/>
+        <text class="pl-title pl-sm" x="170" y="866" text-anchor="middle">Fidelity</text>
+        <foreignObject x="1" y="874" width="338" height="32" class="fo fo-f"><div xmlns="http://www.w3.org/1999/xhtml"><span>\(F = \tfrac{1}{2} + \tfrac{1}{6}\,(\lambda_0 + |b| + |c|)\)</span></div></foreignObject>
+        </svg>
+      <figcaption>
+        <span><i class="pl-key"></i>measurement</span>
+        <span><i class="pl-key t"></i>training, done once ahead of time</span>
+        <span><i class="pl-key e"></i>entries that set the fidelity</span>
+        <p>\(\Lambda = (\lambda_0, a, b, c, w_1, w_2, v_1, v_2, v_3)\) are the nine parameters of the PTM in the gate's Schur frame, which fixes the gauge. The circuits cannot tell an over-rotation from an under-rotation, so QSQ reports \(|a|\); the fidelity does not depend on \(a\). Readout error is in the training simulations, so the model learns to separate it from gate error.</p>
+      </figcaption>
+    </figure>
+  </section>
+
   <!-- ===== 1. Noise ===== -->
   <section id="noise">
     <h2>Draw a noise configuration</h2>
-    <p class="hint">Each draw has amplitude damping, dephasing and readout error, as a provider would report them, plus one hidden gate error that no calibration report shows. <b>Less noise</b> draws √X infidelities up to 5 × 10⁻³, as on current hardware (median about 9 × 10⁻⁴); <b>more noise</b> draws only 2–5 × 10⁻³, the top of that range, so the errors are easier to see in the matrices.</p>
+    <p class="hint">Each draw has amplitude damping, dephasing and readout error, as a provider would report them, plus one hidden gate error that no calibration report shows. <b>Less noise</b> draws \(\sqrt{X}\) infidelities up to \(5\times10^{-3}\), as on current hardware (median about \(9\times10^{-4}\)); <b>more noise</b> draws \(5\times10^{-3}\text{–}10^{-2}\), above that range, so the errors are easier to see in the matrices; its QSQ models are trained up to \(10^{-2}\).</p>
     <div class="row">
       <button class="btn" id="draw" type="button" disabled>Loading…</button>
       <span class="seg" id="level" role="group" aria-label="Noise level"><button type="button" data-level="low" aria-pressed="true">Less noise <small>hardware-realistic</small></button><button type="button" data-level="high" aria-pressed="false">More noise <small>easier to see</small></button></span>
@@ -85,7 +195,7 @@
         <label class="toggle"><input type="checkbox" id="logscale"> Log scale</label>
       </div>
     </div>
-    <p class="hint">Each bar runs from the true infidelity (horizontal line) to the estimate, so its length is the error. Error bars are one standard deviation. Under each name: circuits × shots per circuit.</p>
+    <p class="hint">Each bar runs from the true infidelity (horizontal line) to the estimate, so its length is the error. Error bars are one standard deviation. Under each name: circuits \(\times\) shots per circuit.</p>
     <div class="chart-legend" id="fid-legend"></div>
     <div class="scroll"><div id="fid-chart"></div></div>
     <details class="table">
@@ -100,7 +210,7 @@
       <h2>Pauli transfer matrices</h2>
       <span class="seg" id="ptm-view" role="group" aria-label="Matrix view"><button type="button" data-view="ptm" aria-pressed="true">PTM</button><button type="button" data-view="residual" aria-pressed="false">PTM residual</button></span>
     </div>
-    <p class="hint">All matrices are in the gate's own Schur frame, which for √X is the usual I, X, Y, Z basis. <b>PTM</b> shows each estimate next to the ideal and true matrices; <b>PTM residual</b> shows each estimate minus the true matrix, on its own colour scale. RB has no PTM. QSQ returns only the gauge-invariant eigenvalues, and cannot see the sign of the over-rotation entry <i>a</i> (the Y–Y and Z–Z entries), so its panels show |<i>a</i>| and are compared with the truth folded the same way.</p>
+    <p class="hint">All matrices are in the gate's own Schur frame, which for \(\sqrt{X}\) is the usual \(I, X, Y, Z\) basis. <b>PTM</b> shows each estimate next to the ideal and true matrices; <b>PTM residual</b> shows each estimate minus the true matrix, on its own colour scale. RB has no PTM. QSQ cannot see the sign of the over-rotation entry \(a\) (the \(YY\) and \(ZZ\) entries), so its panels show \(|a|\) and are compared with the truth folded the same way.</p>
     <div class="scale" id="ptm-scale"></div>
     <div id="ptm-grid" class="ptm-grid"></div>
   </section>
@@ -109,9 +219,9 @@
     <h2>What to look for</h2>
     <ul class="notes">
       <li><strong>QPT</strong> assumes perfect state preparation and readout, so readout error ends up in the gate and it usually reports a far worse gate than the true one. <strong>Long-sequence QPT</strong> repeats the gate up to 257 times, which spreads that error thinly.</li>
-      <li><strong>GST</strong> fits preparation, readout and gates together. <strong>Short GST</strong> (no repeated germs) has no amplification, so a 0.1% error can sit below its shot noise.</li>
-      <li><strong>RB</strong> ignores readout error, but its per-gate number averages √X with √Y. A coherent over-rotation of √X makes <strong>interleaved RB</strong> overestimate the error.</li>
-      <li><strong>QSQ</strong> regressors map the failure rates of a few repeated-gate sequences to the gate's eigenvalues. The sets differ in which sequences they use: greedy 8 and 15, greedy with shorter sequences preferred, a structured ladder of lengths, and a 26-sequence baseline.</li>
+      <li><strong>GST</strong> fits preparation, readout and gates together. Both GST designs repeat germs up to 256 times; the <strong>reduced</strong> one (fiducial pair reduction, what labs usually run) keeps only the fiducial pairs each germ needs, 182 circuits instead of 964, so a fixed total budget gives each circuit about five times more shots.</li>
+      <li><strong>RB</strong> ignores readout error, but its per-gate number averages \(\sqrt{X}\) with \(\sqrt{Y}\). A coherent over-rotation of \(\sqrt{X}\) makes <strong>interleaved RB</strong> overestimate the error.</li>
+      <li><strong>QSQ</strong> sets differ only in which circuits they run (see <a href="#how">How QSQ works</a>): a minimal basic set (\(e\), \(\sqrt{X}^2\), \(\sqrt{X}^4\)), the same plus three short \(H\) sequences (\(H^2\), \(H\sqrt{X}H\), \(\sqrt{X}H\sqrt{X}\)), the best 16 and best 30 found by a greedy search, the best 16 with shorter sequences preferred, a structured ladder of lengths, and a 26-sequence baseline.</li>
     </ul>
   </section>
 
@@ -121,6 +231,8 @@
 </main>
 
 <div class="tip" id="tip" role="tooltip"></div>
+<script src="../assets/katex/katex.min.js"></script>
+<script src="../assets/katex/auto-render.min.js"></script>
 <script src="demo.js"></script>
 </body>
 </html>

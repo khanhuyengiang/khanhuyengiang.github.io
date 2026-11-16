@@ -835,12 +835,32 @@ function setupMisc() {
   $("reset").addEventListener("click", () => resetTo(app.init));
   $("copy").addEventListener("click", async () => {
     const text = `${app.init.label} : ${app.seq.map(s => s.label).join(" ")}`;
-    try { await navigator.clipboard.writeText(text); flash($("copy"), "Copied"); }
+    try { await navigator.clipboard.writeText(text); noCloning(); }
     catch { flash($("copy"), "Copy failed"); }
   });
   $("measure").addEventListener("click", measureOnce);
   $("sample").addEventListener("click", sampleShots);
   document.querySelectorAll("input[name=basis]").forEach(r => r.addEventListener("change", () => { $("counts").innerHTML = ""; renderText(); }));
+}
+// The copy works (it is only the classical recipe), but the joke is on no-cloning.
+const NO_CLONING = [
+  "Oh no, you can't copy a quantum state!",
+  "Quantum information can't be copied :(",
+  "No-cloning theorem says no.",
+  "Copy failed successfully: only the classical recipe made it.",
+  "Wootters and Zurek would like a word.",
+  "Cloning denied. Here's the recipe instead.",
+];
+let noCloneTimer = 0, lastQuip = -1;
+function noCloning() {
+  const el = $("copy-msg");
+  let i;
+  do { i = Math.floor(Math.random() * NO_CLONING.length); } while (i === lastQuip && NO_CLONING.length > 1);
+  lastQuip = i;
+  el.textContent = NO_CLONING[i];
+  el.classList.add("show");
+  clearTimeout(noCloneTimer);
+  noCloneTimer = setTimeout(() => el.classList.remove("show"), 2600);
 }
 function flash(btn, text) {
   const old = btn.textContent;

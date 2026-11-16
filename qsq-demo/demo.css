@@ -65,12 +65,12 @@ legend { font-weight: 600; font-size: 14px; margin-bottom: 8px; padding: 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { position: relative; }
 .chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.chip span {
+.chip > span {
   display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;
   padding: 6px 12px; border-radius: 999px; font-size: 13.5px;
   border: 1px solid var(--line); color: var(--muted); background: var(--surface);
 }
-.chip span::before {
+.chip > span::before {
   content: ""; width: 12px; height: 12px; border-radius: 4px; border: 1.5px solid var(--faint); flex: none;
 }
 .chip input:checked + span { color: var(--ink); background: var(--lavender); border-color: transparent; }
@@ -163,3 +163,75 @@ details.table summary { cursor: pointer; color: var(--accent); }
 #noise h2 { --dot: var(--pink-strong); }
 #fidelity h2 { --dot: var(--blue-strong); }
 #ptm h2 { --dot: var(--pink-strong); }
+
+/* ---------- QSQ pipeline figure ---------- */
+#how h2 { --dot: var(--lavender-strong); }
+.pipeline { margin: 18px 0 0; padding: 22px 22px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.pipeline > svg { display: block; width: 100%; max-width: 880px; margin: 0 auto; height: auto; font-family: var(--sans); }
+.pipeline .pl-narrow { display: none; max-width: 360px; margin: 0 auto; }
+.pl-panel { fill: var(--bg); stroke: var(--line); stroke-width: 1.5; }
+.pl-qpu { fill: var(--ink); }
+.pl-model { fill: var(--lavender); stroke: var(--lavender-strong); stroke-width: 1.5; }
+.pl-out { fill: var(--blue); stroke: var(--blue-strong); stroke-width: 1.5; }
+.pl-sim { fill: var(--pink); stroke: var(--pink-strong); stroke-width: 1.5; }
+.pl-title { font-family: var(--serif); font-size: 21px; font-weight: 500; fill: var(--ink); }
+.pl-title.pl-sm { font-size: 16.5px; }
+.pl-title.pl-md { font-size: 19px; }
+.pl-title.pl-xs { font-size: 15.5px; }
+.pl-sub { font-size: 11.5px; fill: var(--muted); }
+.pl-inv { fill: var(--bg); }
+.pl-sub.pl-inv { opacity: 0.75; }
+.pl-wire { stroke: var(--faint); stroke-width: 1.3; }
+.pl-g { fill: var(--lavender); stroke: var(--accent-2); stroke-width: 1.2; }
+.pl-g.pl-h { fill: var(--blue); stroke: var(--blue-strong); }
+.pl-meter { fill: var(--surface); stroke: var(--ink); stroke-width: 1.2; }
+.pl-needle { fill: none; stroke: var(--ink); stroke-width: 1.2; stroke-linecap: round; }
+.pl-dots { font-size: 18px; fill: var(--faint); }
+.pl-num { font-size: 15px; fill: var(--ink); font-variant-numeric: tabular-nums; }
+.pl-narrow .pl-num { font-size: 12.5px; }
+.pl-arrow { fill: none; stroke: var(--lavender-strong); stroke-width: 2.5; stroke-linecap: round; }
+.pl-head { fill: var(--lavender-strong); }
+.pl-train { fill: none; stroke: var(--pink-strong); stroke-width: 2.5; stroke-dasharray: 7 6; stroke-linecap: round; stroke-linejoin: round; }
+.pl-head-t { fill: var(--pink-strong); }
+.pl-tag { font-family: var(--serif); font-style: italic; font-size: 14px; fill: var(--accent); }
+.pl-brk { fill: none; stroke: var(--ink); stroke-width: 1.3; }
+.pipeline figcaption { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px 20px; margin-top: 12px; font-size: 13px; color: var(--muted); }
+.pipeline figcaption p { flex-basis: 100%; margin: 6px 0 0; font-size: 12.5px; color: var(--faint); line-height: 1.55; }
+.pl-key { display: inline-block; width: 18px; height: 0; border-top: 2.5px solid var(--lavender-strong); margin-right: 7px; vertical-align: 4px; }
+.pl-key.t { border-top: 2.5px dashed var(--pink-strong); }
+.pl-key.e { width: 10px; height: 10px; border: 0; border-radius: 3px; background: var(--accent); vertical-align: -1px; }
+@media (max-width: 720px) {
+  .pipeline { padding: 16px 12px 12px; }
+  .pipeline .pl-wide { display: none; }
+  .pipeline .pl-narrow { display: block; }
+}
+.pipeline .pl-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* KaTeX labels inside the SVGs (foreignObject) */
+.demo .katex { font-size: 1.08em; }
+.pipeline .fo, svg.chart .fo { overflow: visible; }
+.pipeline .fo > div, svg.chart .fo > div {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  white-space: nowrap; line-height: 1.15; font-family: var(--sans); color: var(--ink);
+}
+.fo-sub > div { font-size: 11.5px; color: var(--muted) !important; }
+.fo-inv > div { color: var(--bg) !important; opacity: 0.8; }
+.pipeline .fo-title > div { font: 500 16.5px/1 var(--serif); }
+.fo-title.fo-sm > div { font-size: 15px; }
+.fo-gate > div { font-size: 10.5px; }
+.fo-ket > div { font-size: 12px; color: var(--muted) !important; justify-content: flex-end !important; padding-right: 3px; }
+.fo-mx > div { font-size: 14px; color: var(--muted) !important; }
+.fo-mx .pl-z { color: var(--faint); }
+.fo-mx .pl-e { color: var(--accent); font-weight: 700; }
+.fo-f > div { font-size: 13px; }
+svg.chart .fo > div { font-size: 11.5px; color: var(--muted); }
+svg.chart .tick > div { justify-content: flex-end; }
+svg.chart .ylab > div { font-size: 12px; }
+svg.chart .res > div { justify-content: flex-start; font-size: 11px; text-shadow: 0 0 3px var(--bg), 0 0 3px var(--bg), 0 0 2px var(--bg); }
+svg.chart .xlab > div { align-items: flex-start; padding-top: 8px; color: var(--ink); font-size: 12px; }
+svg.chart .xlab > div > span { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+svg.chart .xlab .sub { color: var(--faint); font-size: 11px; }
+.big .katex { font-size: 1em; }
+.pl-wide .fo-sub.fo-xs > div { font-size: 10.5px; }
+.pl-wide .fo-f.fo-xs > div { font-size: 12px; }
+.pl-wide .fo-title.fo-xs > div { font-size: 14.5px; }

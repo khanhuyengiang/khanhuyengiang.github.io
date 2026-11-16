@@ -9,21 +9,23 @@ const SVG = "http://www.w3.org/2000/svg";
 /** Protocol key (as in the data files) -> [display name, short label line 1, line 2]. */
 const NAMES = {
   "RB (per gate)": ["RB, per gate", "RB", "per gate"],
-  "IRB (sx)": ["Interleaved RB", "IRB", "√X"],
-  "QSQ greedy 8": ["QSQ greedy 8", "QSQ", "greedy 8"],
-  "QSQ greedy 15": ["QSQ greedy 15", "QSQ", "greedy 15"],
-  "QSQ greedy short 8": ["QSQ greedy short 8", "QSQ", "greedy short 8"],
-  "QSQ ladder m=10": ["QSQ ladder m=10", "QSQ", "ladder m=10"],
+  "IRB (sx)": ["Interleaved RB", "IRB", "\\(\\sqrt{X}\\)"],
+  "QSQ basic": ["QSQ basic (\\(e, \\sqrt{X}^2, \\sqrt{X}^4\\))", "QSQ", "basic 3"],
+  "QSQ basic+H": ["QSQ basic + H", "QSQ", "basic + H"],
+  "QSQ greedy 8": ["QSQ best 16", "QSQ", "best 16"],
+  "QSQ greedy 15": ["QSQ best 30", "QSQ", "best 30"],
+  "QSQ greedy short 8": ["QSQ best short 16", "QSQ", "best short 16"],
+  "QSQ ladder m=10": ["QSQ ladder \\(m = 10\\)", "QSQ", "ladder \\(m = 10\\)"],
   "QSQ 26 (task 4)": ["QSQ baseline 26", "QSQ", "baseline 26"],
   "QPT": ["QPT", "QPT", "standard"],
   "QPT, long": ["QPT, long sequence", "QPT", "long sequence"],
-  "GST": ["GST", "GST", "long"],
-  "GST, short": ["GST, short (L=1)", "GST", "short"],
+  "GST": ["GST, full design", "GST", "full"],
+  "GST, reduced": ["GST, reduced design (FPR)", "GST", "reduced"],
 };
 const name = (key) => (NAMES[key] || [key])[0];
 
 /** Protocols selected when the page opens. */
-const DEFAULTS = ["RB (per gate)", "QSQ greedy 15", "QSQ greedy short 8", "QSQ 26 (task 4)", "GST"];
+const DEFAULTS = ["RB (per gate)", "QPT, long", "GST, reduced", "GST", "QSQ basic+H", "QSQ greedy short 8", "QSQ greedy 15"];
 const LEVEL_NAMES = { low: "less noise", high: "more noise" };
 
 const state = {
@@ -41,23 +43,41 @@ const state = {
 
 // ---------- formatting ----------
 
-const SUP = { "-": "⁻", 0: "⁰", 1: "¹", 2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹" };
-/** 1.34 × 10⁻³ (digits after the point). */
+const KATEX = { throwOnError: false, trust: (c) => c.command === "\\htmlClass" };
+/** TeX -> HTML (the raw TeX if KaTeX failed to load). */
+const tex = (t) => (window.katex ? katex.renderToString(t, KATEX) : t);
+const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+/** Text with inline \( ... \) math -> HTML. */
+const rich = (t) => t.split(/\\\((.+?)\\\)/s).map((part, i) => (i % 2 ? tex(part) : esc(part))).join("");
+/** Typeset the \( ... \) math already in the page. */
+function typeset(root) {
+  if (window.renderMathInElement) renderMathInElement(root, { ...KATEX, delimiters: [{ left: "\\(", right: "\\)", display: false }] });
+}
+
+/** TeX for 1.34 × 10⁻³ (digits after the point). */
 function sci(v, digits = 2) {
-  if (v === null || !isFinite(v)) return "–";
+  if (v === null || !isFinite(v)) return "\\text{–}";
   if (v === 0) return "0";
   const [m, e] = v.toExponential(digits).split("e");
   const exp = parseInt(e, 10);
-  if (exp === 0) return m;
-  return `${m} × 10${String(exp).replace(/./g, (c) => SUP[c] || c)}`;
+  return exp === 0 ? m : `${m} \\times 10^{${exp}}`;
 }
-const signed = (v, d = 1) => (v >= 0 ? "+" : "−") + sci(Math.abs(v), d);
+const signed = (v, d = 1) => (v >= 0 ? "+" : "-") + sci(Math.abs(v), d);
 const int = (n) => n.toLocaleString("en-US");
+const intTex = (n) => int(n).replace(/,/g, "{,}");
 /** Relative error of *est* against *truth*, e.g. "+12%" or "−3%". */
 function pct(est, truth) {
   const p = (100 * (est - truth)) / truth;
   return `${p >= 0 ? "+" : "−"}${int(Math.round(Math.abs(p)))}%`;
 }
+/** A QSQ sequence as stored ("h sx^192 h") -> TeX. */
+const seqTex = (q) => q.split(" ").map((w) => {
+  const [g, n] = w.split("^");
+  const base = { e: "e", sx: "\\sqrt{X}", h: "H", sy: "\\sqrt{Y}" }[g] || `\\mathrm{${g}}`;
+  return n ? `${base}^{${n}}` : base;
+}).join("\\,");
+/** circuits × shots as TeX. */
+const shotsTex = (c, n) => `${c} \\times ${intTex(n)}`;
 const fixed = (v, d) => (v === null ? "∞" : v.toFixed(d));
 
 function el(tag, attrs = {}, ...children) {
@@ -65,12 +85,18 @@ function el(tag, attrs = {}, ...children) {
   for (const [k, v] of Object.entries(attrs)) {
     if (k === "text") e.textContent = v;
     else if (k === "html") e.innerHTML = v;
+    else if (k === "rich") e.innerHTML = rich(v);
     else e.setAttribute(k, v);
   }
   for (const c of children) if (c != null) e.append(c);
   return e;
 }
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+/** An HTML label inside an SVG chart, so it can hold KaTeX. */
+function fo(x, y, w, h, html, cls, attrs = {}) {
+  return el("svg:foreignObject", { x, y, width: w, height: h, class: `fo ${cls}`, "pointer-events": "none", ...attrs },
+    el("div", {}, el("span", { html })));
+}
 
 // ---------- data ----------
 
@@ -78,12 +104,24 @@ const setting = () => state.data.draws[state.draw].settings[state.mode + state.s
 const visible = () => state.data.protocols.filter((p) => state.enabled.has(p));
 
 /** Fetch (once) the data file of *level*; null if it could not be loaded. */
+/** Protocol families in display order; a protocol's family is the first word of its key ("IRB" counts as RB). */
+const FAMILIES = ["RB", "QPT", "GST", "QSQ"];
+
+/** Order *data*.protocols by family, then by number of circuits (ties keep the file's order). */
+function sortProtocols(data) {
+  const family = (p) => FAMILIES.indexOf(p.replace(/^IRB/, "RB").split(/[ ,]/)[0]);
+  const s = data.draws[0].settings;
+  const circuits = (p) => s[Object.keys(s)[0]][p].circuits;
+  data.protocols = [...data.protocols].sort((a, b) => family(a) - family(b) || circuits(a) - circuits(b));
+  return data;
+}
+
 async function fetchLevel(level) {
   if (!state.cache[level]) {
     try {
       const res = await fetch(`data-${level}.json`);
       if (!res.ok) throw new Error(res.status);
-      state.cache[level] = await res.json();
+      state.cache[level] = sortProtocols(await res.json());
     } catch (err) {
       return null;
     }
@@ -144,40 +182,40 @@ function renderNoise() {
   const r = d.reported;
   const rows = [
     ["1q gate duration", `${r.t_gate_ns.toFixed(0)} ns`],
-    ["T₁", `${fixed(r.T1_us, 1)} µs`],
-    ["T₂", `${fixed(r.T2_us, 1)} µs`, `T_φ = ${fixed(r.Tphi_us, 1)} µs`],
-    ["Readout P(1|0)", r.p1_given_0.toFixed(4)],
-    ["Readout P(0|1)", r.p0_given_1.toFixed(4)],
-    ["Assignment fidelity", r.assignment.toFixed(4), "1 − (P(1|0) + P(0|1))/2"],
-    ["T₁/T₂-limited infidelity", sci(r.r_coherence)],
+    ["\\(T_1\\)", `${fixed(r.T1_us, 1)} µs`],
+    ["\\(T_2\\)", `${fixed(r.T2_us, 1)} µs`, `\\(T_\\varphi\\) = ${fixed(r.Tphi_us, 1)} µs`],
+    ["Readout \\(P(1|0)\\)", r.p1_given_0.toFixed(4)],
+    ["Readout \\(P(0|1)\\)", r.p0_given_1.toFixed(4)],
+    ["Assignment fidelity", r.assignment.toFixed(4), "\\(1 - \\tfrac{1}{2}[P(1|0) + P(0|1)]\\)"],
+    ["\\(T_1/T_2\\)-limited infidelity", `\\(${sci(r.r_coherence)}\\)`],
   ];
   $("reported").replaceChildren(
-    ...rows.flatMap(([k, v, note]) => [el("dt", { text: k }), el("dd", { text: v }, note ? el("small", { text: note }) : null)])
+    ...rows.flatMap(([k, v, note]) => [el("dt", { rich: k }), el("dd", { rich: v }, note ? el("small", { rich: note }) : null)])
   );
 
   const items = d.gate_noise.filter((g) => g.p !== 0).map((g) => {
     if (g.kind === "over_rotation") {
-      const gate = { sx: "√X", sy: "√Y", h: "H" }[g.gate] || g.gate;
-      const role = g.gate === "sx" ? "the gate under test" : "an auxiliary gate (used by QSQ and QPT), not √X itself";
-      const sign = g.deg >= 0 ? "+" : "−";
+      const gate = { sx: "\\sqrt{X}", sy: "\\sqrt{Y}", h: "H" }[g.gate] || `\\mathrm{${g.gate}}`;
+      const role = g.gate === "sx" ? "the gate under test" : "an auxiliary gate (used by QSQ and QPT), not \\(\\sqrt{X}\\) itself";
+      const sign = g.deg >= 0 ? "+" : "-";
       const frac = Math.abs(g.deg) / 180;  // the angle as a fraction of π
-      return el("li", {}, `Over-rotation of ${gate} by ${sign}${(frac * Math.PI).toFixed(4)} rad (${sign}${frac.toFixed(4)}π rad)`,
-        el("span", { class: "role", text: role }));
+      return el("li", { rich: `Over-rotation of \\(${gate}\\) by \\(${sign}${(frac * Math.PI).toFixed(4)}\\) rad (\\(${sign}${frac.toFixed(4)}\\pi\\) rad)` },
+        el("span", { class: "role", rich: role }));
     }
-    return el("li", {}, `Depolarising noise, p = ${sci(g.p)}`,
-      el("span", { class: "role", text: `on every physical gate; adds ${sci(g.error)} to each gate's error` }));
+    return el("li", { rich: `Depolarising noise, \\(p = ${sci(g.p)}\\)` },
+      el("span", { class: "role", rich: `on every physical gate; adds \\(${sci(g.error)}\\) to each gate's error` }));
   });
   if (!items.length) items.push(el("li", { text: "None: the gate-noise channel is off in this draw." }));
   $("hidden").replaceChildren(...items);
 
   const beyond = d.r_true > 0 ? (d.r_true - r.r_coherence) / d.r_true : 0;
   $("truth").replaceChildren(
-    el("div", { class: "draw-id", text: "True √X infidelity" }),
-    el("div", { class: "big", text: sci(d.r_true) }),
+    el("div", { class: "draw-id", rich: "True \\(\\sqrt{X}\\) infidelity" }),
+    el("div", { class: "big", html: tex(sci(d.r_true)) }),
     el("dl", { class: "params", style: "margin-top:6px" },
       el("dt", { text: "Average gate fidelity" }), el("dd", { text: (1 - d.r_true).toFixed(6) }),
-      el("dt", { text: "Eigenvalue infidelity" }), el("dd", { text: sci(d.r_true_eig) }, el("small", { text: "what QSQ is trained on" })),
-      el("dt", { text: "Share beyond T₁/T₂" }), el("dd", { text: `${Math.round(100 * beyond)}%` })),
+      el("dt", { text: "Eigenvalue infidelity" }), el("dd", { html: tex(sci(d.r_true_eig)) }, el("small", { text: "what QSQ is trained on" })),
+      el("dt", { rich: "Share beyond \\(T_1/T_2\\)" }), el("dd", { text: `${Math.round(100 * beyond)}%` })),
   );
   $("noise-cards").hidden = false;
 }
@@ -192,7 +230,7 @@ function buildControls() {
       input.checked ? state.enabled.add(p) : state.enabled.delete(p);
       render();
     });
-    return el("label", { class: "chip" }, input, el("span", { text: name(p) }));
+    return el("label", { class: "chip" }, input, el("span", {}, el("span", { rich: name(p) })));
   }));
   const setAll = (on) => {
     document.querySelectorAll("#protocols input").forEach((i) => (i.checked = on));
@@ -202,8 +240,8 @@ function buildControls() {
   $("all").addEventListener("click", () => setAll(true));
   $("none").addEventListener("click", () => setAll(false));
 
-  $("seqs").replaceChildren(...Object.entries(state.data.qsq_sequences).map(([k, seqs]) =>
-    el("p", {}, el("strong", { text: `${name(k)} (${seqs.length}): ` }), el("code", { text: seqs.join(", ") }))));
+  $("seqs").replaceChildren(...state.data.protocols.filter((k) => k in state.data.qsq_sequences).map((k) => [k, state.data.qsq_sequences[k]]).map(([k, seqs]) =>
+    el("p", {}, el("strong", { rich: `${name(k)} (${seqs.length}): ` }), el("span", { html: seqs.map((q) => tex(seqTex(q))).join(", ") }))));
 
   document.querySelectorAll("input[name=mode]").forEach((r) => r.addEventListener("change", () => {
     state.mode = r.value;
@@ -272,7 +310,7 @@ function renderFidelity() {
   const under = css("--under"), over = css("--over"), ink = css("--truth");
 
   $("fid-legend").replaceChildren(
-    el("span", {}, el("i", { class: "line", style: `background:${ink}` }), `true infidelity ${sci(truth)}`),
+    el("span", {}, el("i", { class: "line", style: `background:${ink}` }), el("span", { rich: `true infidelity \\(${sci(truth)}\\)` })),
     el("span", {}, el("i", { style: `background:${over}` }), "overestimates the error"),
     el("span", {}, el("i", { style: `background:${under}` }), "underestimates the error"),
   );
@@ -299,7 +337,7 @@ function renderFidelity() {
 
   const container = $("fid-chart").parentElement;
   const band = 80;
-  const m = { top: 14, right: 16, bottom: 58, left: 78 };
+  const m = { top: 14, right: 16, bottom: 58, left: 96 };
   const W = Math.max(container.clientWidth, m.left + m.right + band * keys.length);
   const H = 420;
   const iw = W - m.left - m.right, ih = H - m.top - m.bottom;
@@ -315,10 +353,11 @@ function renderFidelity() {
   const grid = el("svg:g", { class: "grid" }), axis = el("svg:g", { class: "axis" });
   for (const t of log ? logTicks(lo, hi) : niceTicks(lo, hi)) {
     grid.append(el("svg:line", { x1: m.left, x2: W - m.right, y1: y(t), y2: y(t) }));
-    axis.append(el("svg:text", { x: m.left - 8, y: y(t) + 4, "text-anchor": "end", text: sci(t, log ? 0 : 1) }));
+    axis.append(fo(0, y(t) - 10, m.left - 8, 20, tex(sci(t, log ? 0 : 1)), "tick"));
   }
-  axis.append(el("svg:text", { x: 14, y: m.top + ih / 2, transform: `rotate(-90 14 ${m.top + ih / 2})`,
-    "text-anchor": "middle", text: `√X infidelity${log ? " (log scale)" : ""}` }));
+  const cy = m.top + ih / 2;
+  axis.append(fo(12 - ih / 2, cy - 12, ih, 24, rich(`\\(\\sqrt{X}\\) infidelity${log ? " (log scale)" : ""}`), "ylab",
+    { transform: `rotate(-90 12 ${cy})` }));
   svg.append(grid, axis);
 
   keys.forEach((k, i) => {
@@ -340,13 +379,10 @@ function renderFidelity() {
       g.append(el("svg:line", { x1: cx - 5, x2: cx + 5, y1: a, y2: a, ...pe }));
       g.append(el("svg:line", { x1: cx - 5, x2: cx + 5, y1: b, y2: b, ...pe }));
     }
-    g.append(el("svg:text", { class: "res", x: cx + w / 2 + 4, y: y1 + 4, "pointer-events": "none",
-      text: (atFloor ? "≤ " : "") + signed(e.r - truth) }));
+    g.append(fo(cx + w / 2 + 4, y1 - 10, 120, 20, tex((atFloor ? "\\le " : "") + signed(e.r - truth)), "res"));
     const [, l1, l2] = NAMES[k] || [k, k, ""];
-    const label = el("svg:text", { class: "xlab", x: cx, y: H - m.bottom + 18, "text-anchor": "middle" });
-    label.append(el("svg:tspan", { x: cx, dy: 0, text: l1 }), el("svg:tspan", { x: cx, dy: 14, text: l2 }),
-      el("svg:tspan", { class: "sub", x: cx, dy: 15, text: `${e.circuits} × ${int(e.shots)}` }));
-    g.append(label);
+    g.append(fo(cx - bw / 2, H - m.bottom + 4, bw, m.bottom - 4,
+      `<span>${rich(l1)}</span><span>${rich(l2)}</span><span class="sub">${tex(shotsTex(e.circuits, e.shots))}</span>`, "xlab"));
     g.addEventListener("mousemove", (ev) => tip(ev, k, e, truth));
     g.addEventListener("mouseleave", hideTip);
     svg.append(g);
@@ -358,11 +394,11 @@ function renderFidelity() {
 function tip(ev, k, e, truth) {
   const t = $("tip");
   t.innerHTML = "";
-  t.append(el("b", { text: name(k) }), el("br"),
-    el("span", { class: "k", text: "estimate " }), `${sci(e.r)}${e.sigma != null ? " ± " + sci(e.sigma, 1) : ""}`, el("br"),
-    el("span", { class: "k", text: "true " }), sci(truth), el("br"),
-    el("span", { class: "k", text: "error " }), `${signed(e.r - truth, 2)} (${pct(e.r, truth)})`, el("br"),
-    el("span", { class: "k", text: "shots " }), `${e.circuits} × ${int(e.shots)} = ${int(e.circuits * e.shots)}`);
+  t.append(el("b", { rich: name(k) }), el("br"),
+    el("span", { class: "k", text: "estimate " }), el("span", { html: tex(`${sci(e.r)}${e.sigma != null ? " \\pm " + sci(e.sigma, 1) : ""}`) }), el("br"),
+    el("span", { class: "k", text: "true " }), el("span", { html: tex(sci(truth)) }), el("br"),
+    el("span", { class: "k", text: "error " }), el("span", { html: tex(signed(e.r - truth, 2)) }), ` (${pct(e.r, truth)})`, el("br"),
+    el("span", { class: "k", text: "shots " }), el("span", { html: tex(`${shotsTex(e.circuits, e.shots)} = ${intTex(e.circuits * e.shots)}`) }));
   t.style.display = "block";
   const x = Math.min(ev.clientX + 14, innerWidth - t.offsetWidth - 8);
   t.style.left = `${x}px`;
@@ -371,14 +407,14 @@ function tip(ev, k, e, truth) {
 const hideTip = () => ($("tip").style.display = "none");
 
 function renderTable(keys, s, truth) {
-  const head = el("tr", {}, ...["Protocol", "Infidelity", "± σ", "Error", "Relative error", "Circuits × shots"].map((h) => el("th", { text: h })));
+  const head = el("tr", {}, ...["Protocol", "Infidelity", "\\(\\pm\\sigma\\)", "Error", "Relative error", "Circuits \\(\\times\\) shots"].map((h) => el("th", { rich: h })));
   const rows = keys.map((k) => {
     const e = s[k];
-    return el("tr", {}, el("td", { text: name(k) }), el("td", { text: sci(e.r) }), el("td", { text: e.sigma == null ? "–" : sci(e.sigma, 1) }),
-      el("td", { text: signed(e.r - truth) }), el("td", { text: pct(e.r, truth) }),
-      el("td", { text: `${e.circuits} × ${int(e.shots)}` }));
+    return el("tr", {}, el("td", { rich: name(k) }), el("td", { html: tex(sci(e.r)) }), el("td", { html: e.sigma == null ? "–" : tex(sci(e.sigma, 1)) }),
+      el("td", { html: tex(signed(e.r - truth)) }), el("td", { text: pct(e.r, truth) }),
+      el("td", { html: tex(shotsTex(e.circuits, e.shots)) }));
   });
-  rows.push(el("tr", {}, el("td", { text: "True" }), el("td", { text: sci(truth) }), el("td"), el("td"), el("td"), el("td")));
+  rows.push(el("tr", {}, el("td", { text: "True" }), el("td", { html: tex(sci(truth)) }), el("td"), el("td"), el("td"), el("td")));
   $("fid-table").replaceChildren(el("thead", {}, head), el("tbody", {}, ...rows));
 }
 
@@ -428,9 +464,9 @@ function renderPtm() {
   const f3 = (v) => (Math.abs(v) < 0.0005 ? "0" : (v > 0 ? "+" : "") + v.toFixed(3));
   const residual = state.ptmView === "residual";
   const panel = (title, sub, M, vmax, fmt) => el("div", { class: "ptm" },
-    el("h4", { text: title }), el("div", { class: "sub", text: sub }), matrix(M, vmax, fmt));
-  const title = (k) => (isQsq(k) ? `${name(k)} (|a|)` : name(k));
-  const shots = (k) => `${s[k].circuits} × ${int(s[k].shots)} shots`;
+    el("h4", { rich: title }), el("div", { class: "sub", rich: sub }), matrix(M, vmax, fmt));
+  const title = (k) => (isQsq(k) ? `${name(k)} (\\(|a|\\))` : name(k));
+  const shots = (k) => `\\(${shotsTex(s[k].circuits, s[k].shots)}\\) shots`;
 
   // Same slots in both views, so every estimate stays put when the view switches:
   // the two references (empty outlines in the residual view, which has nothing to show for them), then each estimate.
@@ -445,10 +481,11 @@ function renderPtm() {
 
   const grad = (vmax) => `background:linear-gradient(90deg, ${cellColor(-vmax, vmax)}, ${cellColor(0, vmax)}, ${cellColor(vmax, vmax)})`;
   $("ptm-scale").replaceChildren(residual
-    ? el("span", {}, `estimate − true:  −${dmax.toFixed(3)}`, el("span", { class: "bar", style: grad(dmax) }), `+${dmax.toFixed(3)}`)
-    : el("span", {}, "−1", el("span", { class: "bar", style: grad(1) }), "+1"));
+    ? el("span", {}, "estimate − true: ", el("span", { html: tex(`-${dmax.toFixed(3)}`) }), el("span", { class: "bar", style: grad(dmax) }), el("span", { html: tex(`+${dmax.toFixed(3)}`) }))
+    : el("span", {}, el("span", { html: tex("-1") }), el("span", { class: "bar", style: grad(1) }), el("span", { html: tex("+1") })));
 }
 
+typeset(document.querySelector("main"));
 $("draw").addEventListener("click", drawNoise);
 document.querySelectorAll("#level button").forEach((b) => b.addEventListener("click", () => setLevel(b.dataset.level)));
 load();

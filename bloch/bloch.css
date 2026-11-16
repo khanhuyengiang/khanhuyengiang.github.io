@@ -38,6 +38,18 @@
   background: var(--lavender); border-radius: var(--radius); padding: 10px 16px; margin-bottom: 20px;
 }
 .seq-bar .row { margin-top: 0; }
+.seq-bar .row { position: relative; }
+/* Out of flow, so showing a message never moves the buttons. */
+.copy-msg {
+  position: absolute; right: 100%; top: 50%; transform: translateY(-50%); margin-right: 12px;
+  white-space: nowrap; pointer-events: none; padding: 2px 8px; border-radius: 999px;
+  background: var(--lavender); font-size: 13px; color: var(--muted); font-style: italic;
+  opacity: 0; transition: opacity 0.25s;
+}
+.copy-msg.show { opacity: 1; }
+@media (max-width: 640px) {
+  .copy-msg { right: auto; left: 0; top: 100%; transform: none; margin: 4px 0 0; white-space: normal; }
+}
 .seq-bar .btn.secondary { background: var(--surface); }
 .seq-bar .btn.secondary:hover { background: var(--pink); }
 .seq-line { display: flex; align-items: baseline; gap: 12px; min-width: 0; flex: 1 1 320px; }
