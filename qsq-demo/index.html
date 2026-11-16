@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Characterising a Noisy √X Gate</title>
   <meta name="description" content="Interactive comparison of RB, QSQ, QPT and GST on a simulated noisy sqrt(X) gate: draw a noise configuration, choose protocols and shot budgets, and compare fidelities and Pauli transfer matrices.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='4' fill='%23ece6fc'/><circle cx='8' cy='8' r='3.5' fill='%23ff8fb8'/></svg>">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-96x96.png" sizes="96x96" type="image/png">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="preload" href="../assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../assets/css/academic.css">
@@ -28,9 +31,10 @@
   <!-- ===== 1. Noise ===== -->
   <section id="noise">
     <h2>Draw a noise configuration</h2>
-    <p class="hint">Each draw has amplitude damping, dephasing and readout error, as a provider would report them, plus one hidden gate error that no calibration report shows.</p>
+    <p class="hint">Each draw has amplitude damping, dephasing and readout error, as a provider would report them, plus one hidden gate error that no calibration report shows. <b>Less noise</b> draws √X infidelities up to 5 × 10⁻³, as on current hardware (median about 9 × 10⁻⁴); <b>more noise</b> draws only 2–5 × 10⁻³, the top of that range, so the errors are easier to see in the matrices.</p>
     <div class="row">
       <button class="btn" id="draw" type="button" disabled>Loading…</button>
+      <span class="seg" id="level" role="group" aria-label="Noise level"><button type="button" data-level="low" aria-pressed="true">Less noise <small>hardware-realistic</small></button><button type="button" data-level="high" aria-pressed="false">More noise <small>easier to see</small></button></span>
       <span class="draw-id" id="draw-id"></span>
     </div>
     <div class="cards" id="noise-cards" hidden>
@@ -112,7 +116,7 @@
   </section>
 
   <div class="demo-foot">
-    Simulated with <a href="https://pypi.org/project/qsq/">qsq</a>. The 100 noise draws and every estimate were computed ahead of time with the same code as the package's comparison notebook; this page only picks a draw and plots it.
+    Simulated with <a href="https://pypi.org/project/qsq/">qsq</a>. The 100 noise draws per level and every estimate were computed ahead of time with the same code as the package's comparison notebook; this page only picks a draw and plots it.
   </div>
 </main>
 

@@ -16,7 +16,8 @@ recipe/
   recipe.css          styles for both recipe pages, on top of assets/css/play.css
 qsq-demo/
   index.html          interactive √X characterisation demo (RB, QSQ, QPT, GST)    demo.js, demo.css
-  data.json           100 precomputed noise draws; regenerate with qsq's scripts/examples/web_demo_data.py
+  data-low.json       100 precomputed noise draws, hardware-realistic; regenerate with qsq's scripts/examples/web_demo_data.py --level low
+  data-high.json      100 precomputed noise draws, infidelity 2-5e-3; regenerate with ... --level high
 bloch/
   index.html          Bloch sphere playground (gates, rotations, custom gates, X/Y/Z measurement)    bloch.js, bloch.css
                       inspired by Blochy (github.com/kherb27/Blochy, MIT) but written from scratch; no dependencies

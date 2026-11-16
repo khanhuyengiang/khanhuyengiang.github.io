@@ -1,12 +1,12 @@
-// Gate characterisation demo: picks a precomputed noise draw from data.json and plots it.
-// data.json is written by qsq's scripts/examples/web_demo_data.py.
+// Gate characterisation demo: picks a precomputed noise draw from data-<level>.json and plots it.
+// data-low.json and data-high.json are written by qsq's scripts/examples/web_demo_data.py --level low|high.
 
 "use strict";
 
 const $ = (id) => document.getElementById(id);
 const SVG = "http://www.w3.org/2000/svg";
 
-/** Protocol key (as in data.json) -> [display name, short label line 1, line 2]. */
+/** Protocol key (as in the data files) -> [display name, short label line 1, line 2]. */
 const NAMES = {
   "RB (per gate)": ["RB, per gate", "RB", "per gate"],
   "IRB (sx)": ["Interleaved RB", "IRB", "√X"],
@@ -22,8 +22,14 @@ const NAMES = {
 };
 const name = (key) => (NAMES[key] || [key])[0];
 
+/** Protocols selected when the page opens. */
+const DEFAULTS = ["RB (per gate)", "QSQ greedy 15", "QSQ greedy short 8", "QSQ 26 (task 4)", "GST"];
+const LEVEL_NAMES = { low: "less noise", high: "more noise" };
+
 const state = {
   data: null,
+  level: "low",
+  cache: {},  // level -> parsed data file
   draw: -1,
   mode: "per",
   shots: { per: 1000, total: 50000 },
@@ -71,19 +77,51 @@ const css = (name) => getComputedStyle(document.documentElement).getPropertyValu
 const setting = () => state.data.draws[state.draw].settings[state.mode + state.shots[state.mode]];
 const visible = () => state.data.protocols.filter((p) => state.enabled.has(p));
 
+/** Fetch (once) the data file of *level*; null if it could not be loaded. */
+async function fetchLevel(level) {
+  if (!state.cache[level]) {
+    try {
+      const res = await fetch(`data-${level}.json`);
+      if (!res.ok) throw new Error(res.status);
+      state.cache[level] = await res.json();
+    } catch (err) {
+      return null;
+    }
+  }
+  return state.cache[level];
+}
+
 async function load() {
-  try {
-    const res = await fetch("data.json");
-    if (!res.ok) throw new Error(res.status);
-    state.data = await res.json();
-  } catch (err) {
+  state.data = await fetchLevel(state.level);
+  if (!state.data) {
     $("draw").textContent = "Could not load the data";
     return;
   }
-  state.data.protocols.forEach((p) => state.enabled.add(p));
+  DEFAULTS.filter((p) => state.data.protocols.includes(p)).forEach((p) => state.enabled.add(p));
   buildControls();
   $("draw").disabled = false;
   $("draw").textContent = "Draw random noise";
+}
+
+/** Switch the noise level; if a draw is on screen, replace it with one from the new level. */
+async function setLevel(level) {
+  if (level === state.level || !state.data) return;
+  const buttons = document.querySelectorAll("#level button");
+  buttons.forEach((b) => (b.disabled = true));
+  $("draw").disabled = true;
+  const data = await fetchLevel(level);
+  buttons.forEach((b) => (b.disabled = false));
+  $("draw").disabled = false;
+  if (!data) {
+    $("draw-id").textContent = `Could not load the ${LEVEL_NAMES[level]} data`;
+    return;
+  }
+  state.level = level;
+  state.data = data;
+  buttons.forEach((b) => b.setAttribute("aria-pressed", b.dataset.level === level));
+  const shown = state.draw >= 0;
+  state.draw = -1;
+  if (shown) drawNoise();
 }
 
 // ---------- step 1: noise ----------
@@ -95,7 +133,7 @@ function drawNoise() {
   state.draw = i;
   state.showFid = state.showPtm = false;
   $("draw").textContent = "Draw another";
-  $("draw-id").textContent = `draw ${i + 1} of ${n}`;
+  $("draw-id").textContent = `draw ${i + 1} of ${n}, ${LEVEL_NAMES[state.level]}`;
   $("run-fid").disabled = $("run-ptm").disabled = false;
   renderNoise();
   render();
@@ -149,7 +187,7 @@ function renderNoise() {
 function buildControls() {
   $("protocols").replaceChildren(...state.data.protocols.map((p) => {
     const input = el("input", { type: "checkbox", value: p });
-    input.checked = true;
+    input.checked = state.enabled.has(p);
     input.addEventListener("change", () => {
       input.checked ? state.enabled.add(p) : state.enabled.delete(p);
       render();
@@ -385,7 +423,8 @@ function renderPtm() {
   }));
   const dmax = Math.max(1e-6, ...Object.values(diffs).flat(2).map(Math.abs));
 
-  const f2 = (v) => (Math.abs(v) < 0.005 ? "0" : v.toFixed(2));
+  // Three decimals: a 10⁻³ infidelity moves the diagonal by ~10⁻³, which two decimals round back to the ideal 1.00.
+  const fPtm = (v) => (Math.abs(v) < 0.0005 ? "0" : v.toFixed(3));
   const f3 = (v) => (Math.abs(v) < 0.0005 ? "0" : (v > 0 ? "+" : "") + v.toFixed(3));
   const residual = state.ptmView === "residual";
   const panel = (title, sub, M, vmax, fmt) => el("div", { class: "ptm" },
@@ -399,8 +438,8 @@ function renderPtm() {
     matrix([[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]], 1, () => ""));
   const panels = residual
     ? [ghost("Ideal"), ghost("True"), ...keys.map((k) => panel(title(k), shots(k), diffs[k], dmax, f3))]
-    : [panel("Ideal", "target", state.data.ptm_ideal, 1, f2), panel("True", "exact, from the channel", d.ptm_true, 1, f2),
-       ...keys.map((k) => panel(title(k), shots(k), s[k].ptm, 1, f2))];
+    : [panel("Ideal", "target", state.data.ptm_ideal, 1, fPtm), panel("True", "exact, from the channel", d.ptm_true, 1, fPtm),
+       ...keys.map((k) => panel(title(k), shots(k), s[k].ptm, 1, fPtm))];
   $("ptm-grid").replaceChildren(...panels);
   if (!keys.length) $("ptm-grid").append(el("p", { class: "empty", text: "No protocol with a PTM selected." }));
 
@@ -411,4 +450,5 @@ function renderPtm() {
 }
 
 $("draw").addEventListener("click", drawNoise);
+document.querySelectorAll("#level button").forEach((b) => b.addEventListener("click", () => setLevel(b.dataset.level)));
 load();
