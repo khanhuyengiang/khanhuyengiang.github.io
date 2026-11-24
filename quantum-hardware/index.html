@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quantum Hardware Platforms</title>
+  <meta name="description" content="What is inside a quantum computer? Pick a hardware platform (superconducting, trapped ions, neutral atoms, photonic, silicon spins, NV centres) and see which component fills each part of the stack, from software to qubit.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-96x96.png" sizes="96x96" type="image/png">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preload" href="../assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../assets/fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../assets/css/academic.css">
+  <link rel="stylesheet" href="hardware.css">
+</head>
+<body>
+<main class="hw">
+
+  <header>
+    <a class="back" href="../">← Khanh Uyen Giang</a>
+    <h1>What is inside a quantum computer?</h1>
+    <p class="lead">
+      Every quantum computer has the same few parts: something to hold the qubits, something to keep them isolated,
+      and a lot of classical electronics and optics to tell them what to do and read the answer back.
+      Pick a hardware platform to see what fills each box.
+    </p>
+  </header>
+
+  <!-- ===== Platform list ===== -->
+  <nav class="platforms" aria-label="Hardware platforms">
+    <div class="plist" id="plist" role="radiogroup" aria-label="Hardware platform"></div>
+  </nav>
+
+  <div class="layout-2">
+
+    <!-- ===== Summary, performance, trade-offs (sticky on wide screens) ===== -->
+    <aside class="side">
+
+      <section class="panel glance" id="glance" aria-live="polite">
+        <h2 id="g-name"></h2>
+        <ul class="blist" id="g-blurb"></ul>
+        <dl class="facts">
+          <div><dt>Operating temperature</dt><dd id="g-temp"></dd></div>
+          <div><dt>Connectivity</dt><dd id="g-conn"></dd></div>
+        </dl>
+      </section>
+
+      <section class="panel perf" aria-label="Typical and state-of-the-art performance">
+        <h2>Typical vs state of the art</h2>
+        <table>
+          <thead><tr><th scope="col"></th><th scope="col">Typical device</th><th scope="col">Best reported</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Gate time<small>1-qubit / 2-qubit</small></th><td id="pf-typical-gate"></td><td id="pf-sota-gate"></td></tr>
+            <tr><th scope="row">Fidelity<small>1-qubit / 2-qubit</small></th><td id="pf-typical-fid"></td><td id="pf-sota-fid"></td></tr>
+            <tr><th scope="row">Qubits</th><td id="pf-typical-qubits"></td><td id="pf-sota-qubits"></td></tr>
+            <tr><th scope="row">Lifetime<small>coherence</small></th><td id="pf-typical-life"></td><td id="pf-sota-life"></td></tr>
+          </tbody>
+        </table>
+        <p class="hint">Rough values as of 2025. Best-reported numbers come from different devices and are usually not achieved together.</p>
+      </section>
+
+      <section class="trade" aria-label="Main advantage and challenge">
+        <div class="tcard adv" id="t-adv" tabindex="0" role="button" aria-describedby="t-hint">
+          <div class="tlabel">Main advantage</div>
+          <ul class="blist" id="t-adv-text"></ul>
+        </div>
+        <div class="tcard chal" id="t-chal" tabindex="0" role="button" aria-describedby="t-hint">
+          <div class="tlabel">Main challenge</div>
+          <ul class="blist" id="t-chal-text"></ul>
+        </div>
+        <p class="hint" id="t-hint">Hover, focus or tap one to highlight the boxes it refers to.</p>
+      </section>
+
+      <p class="credit" id="g-players"></p>
+    </aside>
+
+    <!-- ===== Flowchart ===== -->
+    <section class="chart" id="chart" aria-label="Quantum computer stack">
+        <div class="legend" aria-hidden="true">
+          <span><i class="sw classical"></i>Classical</span>
+          <span><i class="sw path"></i>Signal path</span>
+          <span><i class="sw quantum"></i>Quantum device</span>
+        </div>
+
+        <div class="grid">
+
+          <div class="node classical span" data-node="software">
+            <div class="role">Software &amp; access</div>
+            <div class="what"></div><div class="detail"></div>
+          </div>
+
+          <div class="arr down"><span>pulse schedule</span></div>
+          <div class="arr up"><span>counts</span></div>
+
+          <div class="node classical span" data-node="control">
+            <div class="role">Control electronics</div>
+            <div class="what"></div><div class="detail"></div>
+          </div>
+
+          <div class="arr down"><span>drive signals</span></div>
+          <div class="arr up"><span>raw signal</span></div>
+
+          <div class="node path" data-node="delivery">
+            <div class="role">Signal delivery</div>
+            <div class="what"></div><div class="detail"></div>
+          </div>
+          <div class="node path" data-node="readout">
+            <div class="role">Readout chain</div>
+            <div class="what"></div><div class="detail"></div>
+          </div>
+
+          <div class="arr down"><span>into the cold / vacuum</span></div>
+          <div class="arr up"><span>out of it</span></div>
+
+          <div class="node quantum span env" data-node="env">
+            <div class="role">Cooling &amp; environment</div>
+            <div class="what"></div><div class="detail"></div>
+
+            <div class="inner">
+              <div class="node quantum chip" data-node="chip">
+                <div class="role">Chip / device</div>
+                <div class="what"></div><div class="detail"></div>
+
+                <div class="inner two">
+                  <div class="node quantum" data-node="qubit">
+                    <div class="role">Qubit</div>
+                    <div class="what"></div><div class="detail"></div>
+                  </div>
+                  <div class="node quantum" data-node="coupling">
+                    <div class="role">Two-qubit interaction</div>
+                    <div class="what"></div><div class="detail"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+    </section>
+  </div>
+
+</main>
+<script src="hardware.js"></script>
+</body>
+</html>

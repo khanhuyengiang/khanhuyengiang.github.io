@@ -21,6 +21,9 @@ qsq-demo/
 bloch/
   index.html          Bloch sphere playground (gates, rotations, custom gates, X/Y/Z measurement)    bloch.js, bloch.css
                       inspired by Blochy (github.com/kherb27/Blochy, MIT) but written from scratch; no dependencies
+quantum-hardware/
+  index.html          flowchart of the quantum computing stack; pick a hardware platform to fill in each box    hardware.js, hardware.css
+                      platforms and their components live in the PLATFORMS array at the top of hardware.js; deep links like /quantum-hardware/#ions
 assets/
   katex/              KaTeX 0.16.11 (MIT, LICENSE inside), self-hosted: min js/css + woff2 fonts only; used by bloch/
   fonts/              self-hosted fonts (Inter, Newsreader, Jersey 15), declared at the top of each stylesheet

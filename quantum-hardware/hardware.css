@@ -1,0 +1,164 @@
+/* Quantum hardware explorer, on top of assets/css/academic.css (fonts, colour tokens). */
+
+[hidden] { display: none !important; }
+
+.hw { max-width: 1120px; margin: 0 auto; padding: 8px 24px 64px; }
+.hw header { margin: 8px 0 22px; }
+.hw header h1 { font-size: 36px; line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 10px; }
+.hw header .back { font-size: 14px; display: inline-block; margin-bottom: 18px; }
+.hw .lead { color: var(--muted); max-width: 70ch; }
+.hw h2 { font-size: 20px; margin: 0 0 10px; }
+.hw .hint { color: var(--muted); font-size: 13.5px; margin: 10px 0 0; }
+
+.panel {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px 18px;
+}
+
+/* ---------- layout ---------- */
+.layout-2 { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 24px; align-items: start; margin-top: 18px; }
+.chart { grid-column: 1; grid-row: 1; }
+.side { grid-column: 2; grid-row: 1; display: grid; gap: 14px; position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; scrollbar-width: none; padding: 2px; min-width: 0; }
+.side::-webkit-scrollbar { display: none; }
+
+/* ---------- platform list: a row of choices across the top ---------- */
+.plist { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.pbtn {
+  display: grid; align-content: start; gap: 2px; text-align: left; cursor: pointer; width: 100%;
+  font: inherit; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; position: relative;
+  transition: background .15s, border-color .15s;
+}
+.pbtn b { font-weight: 600; font-size: 14.5px; line-height: 1.3; }
+.pbtn span { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+.pbtn:hover { border-color: var(--lavender-strong); }
+.pbtn[aria-checked="true"] { background: var(--lavender); border-color: var(--lavender-strong); }
+.pbtn:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+/* ---------- at a glance ---------- */
+.glance h2 { font-size: 24px; margin-bottom: 6px; }
+.glance .blist { color: var(--muted); margin: 0 0 12px; font-size: 14.5px; line-height: 1.55; }
+dl.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; margin: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+dl.facts dt { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+dl.facts dd { margin: 2px 0 0; font-size: 13.5px; line-height: 1.45; }
+
+/* ---------- typical vs state of the art ---------- */
+.perf h2 { font-size: 18px; margin-bottom: 8px; }
+.perf table { width: 100%; border-collapse: collapse; font-size: 13.5px; table-layout: fixed; }
+.perf thead th { font: 600 11.5px/1.3 var(--sans); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); text-align: left; padding: 0 8px 6px 0; }
+.perf thead th:nth-child(1) { width: 27%; }
+.perf tbody th, .perf td { text-align: left; vertical-align: top; padding: 8px 8px 8px 0; border-top: 1px solid var(--line); line-height: 1.4; }
+.perf tbody th { font-weight: 500; }
+.perf tbody th small { display: block; font-size: 11.5px; color: var(--muted); font-weight: 400; }
+.perf td:last-child { color: var(--accent-2); font-weight: 500; padding-right: 0; }
+.perf .hint { margin-top: 8px; font-size: 12.5px; }
+
+/* ---------- advantage / challenge: hovering one highlights its boxes in the flowchart ---------- */
+.trade { border: 0; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tcard {
+  border: 1px solid var(--tone-strong); border-radius: var(--radius); padding: 12px 14px; font-size: 13.5px; line-height: 1.5;
+  background: var(--surface); cursor: pointer;
+}
+.tcard.adv { --tone-strong: var(--blue-strong); }
+.tcard.chal { --tone-strong: var(--pink-strong); }
+.tcard.adv.on { background: var(--blue); }
+.tcard.chal.on { background: var(--pink); }
+.tcard:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.tlabel { font-size: 11.5px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: color-mix(in srgb, var(--tone-strong) 55%, var(--ink)); margin-bottom: 4px; }
+.trade .hint { grid-column: 1 / -1; margin: 0; font-size: 12.5px; }
+
+/* ---------- flowchart ---------- */
+.chart { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--muted); margin-bottom: 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 4px; display: inline-block; border: 1px solid transparent; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 14px; }
+.span { grid-column: 1 / -1; }
+
+.node {
+  --tone: var(--blue); --tone-strong: var(--blue-strong);
+  background: var(--tone); border: 1px solid transparent; border-radius: 12px; padding: 10px 14px 12px;
+  min-width: 0;
+}
+.node.classical { --tone: var(--blue); --tone-strong: var(--blue-strong); }
+.node.path { --tone: var(--lavender); --tone-strong: var(--lavender-strong); }
+.node.quantum { --tone: var(--pink); --tone-strong: var(--pink-strong); }
+.legend .sw.classical { background: var(--blue); border-color: var(--blue-strong); }
+.legend .sw.path { background: var(--lavender); border-color: var(--lavender-strong); }
+.legend .sw.quantum { background: var(--pink); border-color: var(--pink-strong); }
+
+.node .role { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: color-mix(in srgb, var(--tone-strong) 55%, var(--ink)); }
+.node .what { font: 500 18px/1.3 var(--serif); color: var(--ink); margin-top: 6px; }
+.node .detail { font-size: 13.5px; line-height: 1.5; color: var(--muted); margin-top: 2px; }
+.node .detail ul { margin: 0; padding-left: 1.15em; }
+.blist { margin: 0; padding-left: 1.15em; }
+.blist li + li, .node .detail li + li { margin-top: 2px; }
+.blist li::marker, .node .detail li::marker { color: var(--faint); }
+.node.has { border-color: var(--tone-strong); }
+
+/* Nested boxes: the environment contains the chip, which contains the qubits. */
+.node .inner { margin-top: 12px; display: grid; gap: 10px; }
+.node .inner.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.node.env > .inner > .node, .node.chip > .inner > .node { background: var(--surface); border-color: var(--tone-strong); }
+.node.env { background: var(--tone); }
+.node.chip { background: var(--surface); }
+.node.chip .inner .node { background: var(--tone); }
+
+/* Filling a box: a brief wash of the box colour. */
+.node.flash > .what, .node.flash > .detail { animation: wash .7s ease-out backwards; animation-delay: var(--d, 0ms); }
+@keyframes wash {
+  0% { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .node.flash > .what, .node.flash > .detail { animation: none; }
+}
+
+/* While an advantage or challenge is hovered, the boxes it refers to stand out and the rest of the text fades. */
+.chart.focusing .node:not(.hl) > .role,
+.chart.focusing .node:not(.hl) > .what, .chart.focusing .node:not(.hl) > .detail { opacity: 0.35; }
+.node > .role, .node > .what, .node > .detail { transition: opacity .2s; }
+.node.hl { border-width: 2px; padding: 9px 13px 11px; box-shadow: 0 0 0 4px var(--hl, var(--lavender-strong)); 
+  animation: glow-in .25s ease-out; }
+/* Fades in from nothing. It plays only when a box starts glowing, so switching between advantage and challenge changes colour at once. */
+@keyframes glow-in { from { box-shadow: 0 0 0 4px transparent; } }
+.chart[data-kind="adv"] .node.hl { --hl: var(--blue-strong); border-color: var(--accent-2); }
+.chart[data-kind="chal"] .node.hl { --hl: var(--pink-strong); border-color: var(--accent); }
+
+/* ---------- arrows between boxes: commands go down on the left, results come up on the right ---------- */
+.arr { position: relative; height: 38px; }
+.arr::before { content: ""; position: absolute; left: 50%; top: 2px; bottom: 2px; width: 2px; margin-left: -1px; background: var(--lavender-strong); border-radius: 2px; }
+.arr::after { content: ""; position: absolute; left: 50%; margin-left: -6px; border: 6px solid transparent; }
+.arr.down::after { bottom: 0; border-top: 8px solid var(--lavender-strong); border-bottom: 0; }
+.arr.up::after { top: 0; border-bottom: 8px solid var(--lavender-strong); border-top: 0; }
+.arr span { position: absolute; left: calc(50% + 12px); top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+.credit { color: var(--muted); font-size: 13.5px; margin: 0; padding-top: 4px; }
+
+/* ---------- narrow screens: everything stacks; the side panel comes first so the highlight is just above the chart ---------- */
+@media (max-width: 980px) {
+  .layout-2 { grid-template-columns: minmax(0, 1fr); }
+  .chart, .side { grid-column: 1; grid-row: auto; }
+  .side { position: static; max-height: none; overflow: visible; padding: 0; }
+  .plist { grid-template-columns: none; display: flex; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x proximity; }
+  .pbtn { flex: none; width: auto; min-width: 150px; max-width: 200px; scroll-snap-align: start; }
+}
+@media (max-width: 820px) {
+  .hw { padding: 8px 16px 48px; }
+  .hw header h1 { font-size: 28px; }
+  .layout-2 { gap: 16px; }
+  .node .what { font-size: 16px; }
+  .node .detail { font-size: 12.5px; }
+  .node .inner.two { grid-template-columns: minmax(0, 1fr); }
+  .chart { padding: 12px; }
+  .arr span { font-size: 11px; }
+}
+@media (max-width: 480px) {
+  .trade { grid-template-columns: minmax(0, 1fr); }
+  dl.facts { grid-template-columns: minmax(0, 1fr); }
+  .grid { gap: 0 8px; }
+  .node { padding: 8px 10px 10px; }
+  .node.hl { padding: 7px 9px 9px; }
+  .arr span { display: none; }
+}
