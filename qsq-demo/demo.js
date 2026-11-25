@@ -269,7 +269,7 @@ function buildControls() {
   $("errorbars").addEventListener("change", render);
   $("logscale").addEventListener("change", render);
   window.addEventListener("resize", () => state.showFid && renderFidelity());
-  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+  document.addEventListener("themechange", render);
 }
 
 function render() {
@@ -434,7 +434,7 @@ function cellColor(v, vmax) {
 }
 
 function matrix(M, vmax, fmt) {
-  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const dark = isDarkTheme();
   const L = ["I", "X", "Y", "Z"];
   const g = el("div", { class: "mat" }, el("span"), ...L.map((l) => el("span", { class: "ax", text: l })));
   M.forEach((row, i) => {

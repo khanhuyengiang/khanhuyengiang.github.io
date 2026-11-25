@@ -155,6 +155,12 @@ const PLATFORMS = [
   },
 ];
 
+// How warm each platform operates (0 = millikelvin, 1 = room temperature); sets the dot colour: blue, then purple, then pink.
+const HEAT = { superconducting: 0, 'silicon-spin': 0.12, ions: 0.5, photonic: 0.7, 'nv-centre': 0.85, 'neutral-atoms': 1 };
+const heatColor = h => h <= 0.5
+  ? `color-mix(in srgb, var(--lavender-strong) ${h * 200}%, var(--blue-strong))`
+  : `color-mix(in srgb, var(--pink-strong) ${(h - 0.5) * 200}%, var(--lavender-strong))`;
+
 const NODE_ORDER = ['software', 'control', 'delivery', 'readout', 'env', 'chip', 'qubit', 'coupling'];
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -239,13 +245,19 @@ function select(id, { updateHash = true } = {}) {
     }
   });
 
+  $('.side').style.setProperty('--dot', heatColor(HEAT[id] ?? 0.5));
   $('#g-name').textContent = p.name;
   bullets($('#g-blurb'), p.blurb);
   $('#g-players').textContent = 'Examples: ' + p.players;
   $('#g-temp').textContent = p.temp;
   $('#g-conn').textContent = p.conn;
   ['typical', 'sota'].forEach(col => {
-    ['gate', 'fid', 'qubits', 'life'].forEach(row => { $(`#pf-${col}-${row}`).textContent = p.perf[col][row]; });
+    ['gate', 'fid', 'qubits', 'life'].forEach(row => {
+      const cell = $(`#pf-${col}-${row}`);
+      // Gate time and fidelity are "1-qubit / 2-qubit" pairs: one per line.
+      const lines = (row === 'gate' || row === 'fid') ? p.perf[col][row].split(' / ') : [p.perf[col][row]];
+      cell.replaceChildren(...lines.map(t => { const d = document.createElement('div'); d.textContent = t; return d; }));
+    });
   });
   bullets($('#t-adv-text'), p.advantage.items);
   bullets($('#t-chal-text'), p.challenge.items);

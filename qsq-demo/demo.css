@@ -9,7 +9,7 @@
   --cell-ink-light: #ffffff;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --under: #f07a6e;
     --over: #6fa8f0;
     --mid: #383835;
@@ -17,6 +17,13 @@
     --cell-ink-light: #ffffff;
   }
 }
+:root[data-theme="dark"] {
+    --under: #f07a6e;
+    --over: #6fa8f0;
+    --mid: #383835;
+    --truth: #eeeaff;
+    --cell-ink-light: #ffffff;
+  }
 
 .demo { max-width: 1080px; margin: 0 auto; padding: 8px 24px 80px; }
 .demo header { margin: 8px 0 28px; }

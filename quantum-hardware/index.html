@@ -12,6 +12,7 @@
   <link rel="preload" href="../assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../assets/css/academic.css">
+  <script src="../assets/theme.js"></script>
   <link rel="stylesheet" href="hardware.css">
 </head>
 <body>
@@ -19,26 +20,26 @@
 
   <header>
     <a class="back" href="../">← Khanh Uyen Giang</a>
-    <h1>What is inside a quantum computer?</h1>
+    <h1>Quantum hardware platforms breakdown</h1>
     <p class="lead">
-      Every quantum computer has the same few parts: something to hold the qubits, something to keep them isolated,
-      and a lot of classical electronics and optics to tell them what to do and read the answer back.
-      Pick a hardware platform to see what fills each box.
+      A comparison of six qubit platforms. The chart shows what sits at each level of the stack, from compiler to qubit,
+      and the panel beside it lists typical and best reported gate times, fidelities and qubit counts.
+      Hovering over a platform's main advantage or challenge highlights the parts of the stack it comes from.
     </p>
   </header>
 
-  <!-- ===== Platform list ===== -->
-  <nav class="platforms" aria-label="Hardware platforms">
-    <div class="plist" id="plist" role="radiogroup" aria-label="Hardware platform"></div>
-  </nav>
-
   <div class="layout-2">
+
+    <!-- ===== Platform list: a row on top, or a column on the left on wide screens ===== -->
+    <nav class="platforms" aria-label="Hardware platforms">
+      <div class="plist" id="plist" role="radiogroup" aria-label="Hardware platform"></div>
+    </nav>
 
     <!-- ===== Summary, performance, trade-offs (sticky on wide screens) ===== -->
     <aside class="side">
 
       <section class="panel glance" id="glance" aria-live="polite">
-        <h2 id="g-name"></h2>
+        <h2 id="g-name" class="dotted"></h2>
         <ul class="blist" id="g-blurb"></ul>
         <dl class="facts">
           <div><dt>Operating temperature</dt><dd id="g-temp"></dd></div>
@@ -47,12 +48,12 @@
       </section>
 
       <section class="panel perf" aria-label="Typical and state-of-the-art performance">
-        <h2>Typical vs state of the art</h2>
+        <h2 class="dotted">Typical vs state of the art</h2>
         <table>
           <thead><tr><th scope="col"></th><th scope="col">Typical device</th><th scope="col">Best reported</th></tr></thead>
           <tbody>
-            <tr><th scope="row">Gate time<small>1-qubit / 2-qubit</small></th><td id="pf-typical-gate"></td><td id="pf-sota-gate"></td></tr>
-            <tr><th scope="row">Fidelity<small>1-qubit / 2-qubit</small></th><td id="pf-typical-fid"></td><td id="pf-sota-fid"></td></tr>
+            <tr><th scope="row" class="two">Gate time<small><span>1-qubit</span><span>2-qubit</span></small></th><td id="pf-typical-gate"></td><td id="pf-sota-gate"></td></tr>
+            <tr><th scope="row" class="two">Fidelity<small><span>1-qubit</span><span>2-qubit</span></small></th><td id="pf-typical-fid"></td><td id="pf-sota-fid"></td></tr>
             <tr><th scope="row">Qubits</th><td id="pf-typical-qubits"></td><td id="pf-sota-qubits"></td></tr>
             <tr><th scope="row">Lifetime<small>coherence</small></th><td id="pf-typical-life"></td><td id="pf-sota-life"></td></tr>
           </tbody>

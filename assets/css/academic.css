@@ -44,7 +44,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #17142a;
     --surface: #1f1b36;
     --ink: #eeeaff;
@@ -59,6 +59,20 @@
     color-scheme: dark;
   }
 }
+:root[data-theme="dark"] {
+    --bg: #17142a;
+    --surface: #1f1b36;
+    --ink: #eeeaff;
+    --muted: #b4acd6;
+    --faint: #8a82ad;
+    --line: #2f2950;
+    --pink: #3a2342;
+    --lavender: #2c2552;
+    --blue: #1d2d47;
+    --accent: #ff9ec3;
+    --accent-2: #c5b4ff;
+    color-scheme: dark;
+  }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -254,3 +268,18 @@ footer a { color: var(--muted); }
   html { scroll-behavior: auto; }
   .pub, .teaser .go { transition: none; }
 }
+
+/* ---------- light / dark switch (injected by assets/theme.js) ---------- */
+.theme-toggle {
+  display: inline-grid; place-items: center; width: 34px; height: 34px; padding: 0; cursor: pointer;
+  border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--accent-2);
+}
+.theme-toggle:hover { background: var(--lavender); }
+.theme-toggle svg { width: 18px; height: 18px; }
+.theme-toggle .sun { display: none; }
+:root[data-resolved="dark"] .theme-toggle .sun { display: block; }
+:root[data-resolved="dark"] .theme-toggle .moon { display: none; }
+.topnav .theme-toggle { flex: none; }
+/* sub-pages: align with the right edge of the 1080px text column, not the viewport corner */
+.theme-toggle.floating { position: absolute; top: 14px; right: max(16px, calc((100% - var(--col-w, 1080px)) / 2 + 24px)); z-index: 10; }
+body { position: relative; }

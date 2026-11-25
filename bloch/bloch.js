@@ -508,7 +508,7 @@ function readColors() {
     ink: g("--ink"), bg: g("--bg"), muted: g("--muted"), faint: g("--faint"), line: g("--line"), surface: g("--surface"),
     lav: g("--lavender"), accent: g("--accent"), accent2: g("--accent-2"),
     x: g("--pink-strong") || "#ff8fb8", y: g("--blue-strong") || "#8fd0fa", z: g("--lavender-strong") || "#b9a3f0",
-    dark: window.matchMedia("(prefers-color-scheme: dark)").matches,
+    dark: isDarkTheme(),
   };
 }
 
@@ -880,5 +880,5 @@ setupMisc();
 new ResizeObserver(resize).observe($("sphere-wrap"));
 // Typeset the static math in the page (hints, field labels).
 document.querySelectorAll("[data-tex]").forEach(el => { el.innerHTML = M(el.dataset.tex); });
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { readColors(); draw(); });
+document.addEventListener("themechange", () => { readColors(); draw(); });
 render();
