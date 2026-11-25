@@ -13,6 +13,7 @@
   <link rel="preload" href="../assets/fonts/newsreader-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../assets/css/academic.css">
   <script src="../assets/theme.js"></script>
+  <link rel="stylesheet" href="../assets/katex/katex.min.css">
   <link rel="stylesheet" href="hardware.css">
 </head>
 <body>
@@ -35,8 +36,16 @@
       <div class="plist" id="plist" role="radiogroup" aria-label="Hardware platform"></div>
     </nav>
 
+    <!-- ===== Qubit drawings: device, circuit, physics ===== -->
+    <details class="schems" id="schems" open hidden>
+      <summary>Qubit drawings</summary>
+      <div class="schems-body" id="schems-body"></div>
+    </details>
+
     <!-- ===== Summary, performance, trade-offs (sticky on wide screens) ===== -->
-    <aside class="side">
+    <details class="side" id="side" open>
+      <summary>Details</summary>
+      <div class="side-body">
 
       <section class="panel glance" id="glance" aria-live="polite">
         <h2 id="g-name" class="dotted"></h2>
@@ -58,7 +67,7 @@
             <tr><th scope="row">Lifetime<small>coherence</small></th><td id="pf-typical-life"></td><td id="pf-sota-life"></td></tr>
           </tbody>
         </table>
-        <p class="hint">Rough values as of 2025. Best-reported numbers come from different devices and are usually not achieved together.</p>
+        <p class="hint">Values as of late 2026; numbered references are listed at the bottom. Best-reported numbers come from different devices and are usually not achieved together.</p>
       </section>
 
       <section class="trade" aria-label="Main advantage and challenge">
@@ -74,7 +83,8 @@
       </section>
 
       <p class="credit" id="g-players"></p>
-    </aside>
+      </div>
+    </details>
 
     <!-- ===== Flowchart ===== -->
     <section class="chart" id="chart" aria-label="Quantum computer stack">
@@ -141,7 +151,18 @@
     </section>
   </div>
 
+  <details class="refs" id="refs">
+    <summary>References</summary>
+    <p class="hint">Numbers on this page come from the papers below. Typical values are representative of current devices; best reported values come from different devices and are usually not achieved together. Names are authors as the papers print them: “corresponding author” only where the paper says so, otherwise the last author or the author given as email contact. Most papers do not name a group leader.</p>
+    <span class="seg" id="refs-view" role="group" aria-label="Reference view">
+      <button type="button" data-view="device" aria-pressed="true">Device</button>
+      <button type="button" data-view="full" aria-pressed="false">Full reference</button>
+    </span>
+    <div id="refs-body"></div>
+  </details>
+
 </main>
+<script src="../assets/katex/katex.min.js"></script>
 <script src="hardware.js"></script>
 </body>
 </html>
